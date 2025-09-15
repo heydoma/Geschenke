@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Eat the Film Rätsel</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    text-align: center;
+    padding: 50px;
+}
+input, button {
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px;
+}
+.hidden {
+    display: none;
+}
+</style>
+</head>
+<body>
+
+<h1>Willkommen zum „Geschenk“-Rätsel 🎂</h1>
+<p>Beantworte die Fragen richtig, um das Geschenk freizuschalten!</p>
+
+<!-- Rätsel 1 -->
+<div id="riddle1">
+    <p>1️⃣ Ich bin das Einzige, das du verschenken kannst, ohne es zu besitzen. Ich vergehe, wenn du mich nicht nutzt, und bin am wertvollsten, wenn du sie mit anderen teilst. Was bin ich?</p>
+    <input type="text" id="answer1" placeholder="Deine Antwort">
+    <button onclick="checkRiddle1()">Antwort prüfen</button>
+    <p id="hint1" class="hidden">Versuch nochmal!</p>
+    <p id="tip1" class="hidden">Tipp: Es ist etwas, das man nicht kaufen kann und gemeinsam erlebt.</p>
+</div>
+
+<!-- Rätsel 2 -->
+<div id="riddle2" class="hidden">
+    <p>2️⃣ Ich bin eine Tätigkeit, die Menschen täglich tun. Ohne mich gäbe es keine Energie, kein Wachstum, kein Genuss. Ich kann mit Freunden geteilt werden, allein genossen werden, und manchmal bin ich ein Fest. Was ist das englische Wort für mich?</p>
+    <input type="text" id="answer2" placeholder="Deine Antwort">
+    <button onclick="checkRiddle2()">Antwort prüfen</button>
+    <p id="hint2" class="hidden">Versuch nochmal!</p>
+    <p id="tip2" class="hidden">Tipp: Dieses Wort beschreibt etwas, das du mindestens drei Mal am Tag tust – manchmal mit Messer und Gabel, manchmal mit den Händen.</p>
+</div>
+
+<!-- Rätsel 3 -->
+<div id="riddle3" class="hidden">
+    <p>3️⃣ Ich bin ein englisches Wort. Ich kann spannend, traurig oder lustig sein. Manchmal bin ich ein Mainstream, manchmal ein Geheimtipp. Oft fragt man Freunde nach ihren Tipps. Was bin ich?</p>
+    <input type="text" id="answer3" placeholder="Deine Antwort">
+    <button onclick="checkRiddle3()">Antwort prüfen</button>
+    <p id="hint3" class="hidden">Versuch nochmal!</p>
+    <p id="tip3" class="hidden">Tipp: Mein Name steht oft auf Plakaten, wenn ein neuer Blockbuster erscheint.</p>
+</div>
+
+<!-- Endgültige Freischaltung -->
+<div id="riddle4" class="hidden">
+    <p>4️⃣ Was ist dein Lieblingsfilm?</p>
+    <input type="text" id="answer4" placeholder="Deine Antwort">
+    <button onclick="checkRiddle4()">Antwort prüfen</button>
+    <p id="hint4" class="hidden">Versuch nochmal!</p>
+    <p id="tip4" class="hidden">Tipp: Dieser Film zeigt den Aufstieg und Fall eines Gangsters in Harlem. Wie heißt er?</p>
+</div>
+
+<div id="final" class="hidden">
+    <h2>🎉 Herzlichen Glückwunsch!</h2>
+    <p>Du hast alle Rätsel gelöst! Dein Gutschein wartet:</p>
+    <a href="geschenk.JPG" target="_blank">
+        <button>Gutschein öffnen</button>
+    </a>
+</div>
+
+<script>
+let riddle1Tries = 0;
+let riddle2Tries = 0;
+let riddle3Tries = 0;
+let riddle4Tries = 0;
+
+function checkRiddle1() {
+    let a1 = document.getElementById('answer1').value.trim().toLowerCase();
+    if(a1.includes("gemeinsame zeit")) {
+        document.getElementById('riddle1').classList.add('hidden');
+        document.getElementById('riddle2').classList.remove('hidden');
+        document.getElementById('hint1').classList.add('hidden');
+        document.getElementById('tip1').classList.add('hidden');
+        riddle1Tries = 0;
+    } else {
+        riddle1Tries++;
+        document.getElementById('hint1').classList.remove('hidden');
+        if(riddle1Tries >= 3) {
+            document.getElementById('tip1').classList.remove('hidden');
+        }
+    }
+}
+
+function checkRiddle2() {
+    let a2 = document.getElementById('answer2').value.trim().toLowerCase();
+    if(a2 === "eat") {
+        document.getElementById('riddle2').classList.add('hidden');
+        document.getElementById('riddle3').classList.remove('hidden');
+        document.getElementById('hint2').classList.add('hidden');
+        document.getElementById('tip2').classList.add('hidden');
+        riddle2Tries = 0;
+    } else {
+        riddle2Tries++;
+        document.getElementById('hint2').classList.remove('hidden');
+        if(riddle2Tries >= 3) {
+            document.getElementById('tip2').classList.remove('hidden');
+        }
+    }
+}
+
+function checkRiddle3() {
+    let a3 = document.getElementById('answer3').value.trim().toLowerCase();
+    if(a3 === "the movie" || a3 === "movie") {
+        document.getElementById('riddle3').classList.add('hidden');
+        document.getElementById('riddle4').classList.remove('hidden');
+        document.getElementById('hint3').classList.add('hidden');
+        document.getElementById('tip3').classList.add('hidden');
+        riddle3Tries = 0;
+    } else {
+        riddle3Tries++;
+        document.getElementById('hint3').classList.remove('hidden');
+        if(riddle3Tries >= 3) {
+            document.getElementById('tip3').classList.remove('hidden');
+        }
+    }
+}
+
+function checkRiddle4() {
+    let a4 = document.getElementById('answer4').value.trim().toLowerCase();
+    if(a4.includes("american gangster")) {
+        document.getElementById('riddle4').classList.add('hidden');
+        document.getElementById('final').classList.remove('hidden');
+        document.getElementById('hint4').classList.add('hidden');
+        document.getElementById('tip4').classList.add('hidden');
+        riddle4Tries = 0;
+    } else {
+        riddle4Tries++;
+        document.getElementById('hint4').classList.remove('hidden');
+        if(riddle4Tries >= 3) {
+            document.getElementById('tip4').classList.remove('hidden');
+        }
+    }
+}
+</script>
+
+</body>
+</html>
