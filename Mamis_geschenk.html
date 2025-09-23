@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Geburtstags Rätsel</title>
+<style>
+/* Eigene Klassen für Eingabefeld und Button */
+.birthday-input {
+    padding: 12px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    border: none;
+    background: #222;
+    color: #ffb347;
+    -webkit-text-fill-color: #ffb347; /* Safari / Chrome */
+    -moz-text-fill-color: #ffb347;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px #ffb34744;
+    font-weight: 500;
+}
+.birthday-input::placeholder {
+    color: #ffb347;
+    opacity: 1;
+    font-weight: 500;
+    -webkit-text-fill-color: #ffb347;
+}
+.birthday-btn {
+    padding: 12px 28px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    border: none;
+    background: #ffb347;
+    color: #222;
+    -webkit-text-fill-color: #222;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #ffb34744;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.03em;
+}
+.birthday-btn:hover {
+    background: #ff6f91;
+    color: #222;
+}
+.emptytext {
+    color: #ffb347;
+    font-size: 1em;
+    margin-top: 6px;
+    font-style: italic;
+    display: none;
+}
+.headline-gradient {
+    background: linear-gradient(90deg,#ffb347 0%,#ff6f91 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+    color: #ffb347;
+    text-shadow: 0 2px 10px #222, 0 0 8px #ffb34799;
+    font-weight: 600;
+}
+.question-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #ffb347;
+    text-shadow: 0 2px 10px #222, 0 0 8px #ffb34799;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+}   
+
+.question-headline {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 18px;
+    background: linear-gradient(90deg,#ffb347 0%,#ff6f91 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+    text-shadow: 0 2px 10px #222, 0 0 8px #ffb34799;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+}
+.question-text {
+    font-size: 1.18em;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    background: linear-gradient(90deg,#ffb347 0%,#ff6f91 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #ffb34722;
+    padding: 18px 16px;
+    font-family: inherit;
+    animation: fadeInCard 0.7s;
+    color: #ffb347;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px #222, 0 0 8px #ffb34799;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    /* Firefox support */
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+}
+   
+@keyframes fadeInCard {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.riddle-box p {
+    font-size: 1.18em;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    color: #f7f7f7;
+    letter-spacing: 0.02em;
+}
+
+.riddle-box input {
+    margin-bottom: 18px;
+}
+
+.riddle-box button {
+    margin-top: 8px;
+}
+
+.riddle-box h2, .riddle-box h3 {
+    color: #ffb347;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.riddle-box .tip {
+    color: #ff6f91;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 1em;
+}
+
+.riddle-box .hint {
+    color: #ffb347;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 1em;
+}
+body {
+    font-family: 'Quicksand', 'Arial', sans-serif;
+    background: linear-gradient(135deg, #181818 60%, #222 100%);
+    color: #f7f7f7;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: center;
+}
+
+.birthday-confetti {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    background: url('https://cdn.pixabay.com/photo/2016/03/31/20/11/confetti-1296656_1280.png') repeat top center;
+    opacity: 0.15;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #ffb347;
+    text-shadow: 0 2px 10px #222, 0 0 8px #ffb34799;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 1.5em;
+    color: #ffb347;
+    text-shadow: 0 2px 10px #222, 0 0 8px #ffb34799;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+
+.riddle-box {
+    background: rgba(30,30,30,0.95);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px #000a, 0 0 0 2px #ffb34744;
+    padding: 32px 24px 24px 24px;
+    margin: 30px auto;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+    border: 2px solid #ffb34744;
+}
+
+input {
+    padding: 12px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    border: none;
+    background: #222;
+    color: #ffb347;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px #ffb34744;
+    font-weight: 500;
+}
+input::placeholder {
+    color: #ffb347;
+    opacity: 1;
+    font-weight: 500;
+}
+
+button {
+    padding: 12px 28px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    border: none;
+    background: #ffb347;
+    color: #222;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #ffb34744;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.03em;
+}
+button:hover {
+    background: #ff6f91;
+    color: #222;
+}
+input::placeholder {
+    color: #ffb347;
+    opacity: 1;
+    font-weight: 400;
+}
+
+button {
+    padding: 12px 28px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(90deg,#ffb347,#ff6f91);
+    color: #181818;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #ffb34744;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.03em;
+    text-shadow: 0 2px 8px #ffb34722;
+}
+button:hover {
+    background: linear-gradient(90deg,#ff6f91,#ffb347);
+    color: #000;
+}
+
+button {
+    padding: 12px 28px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(90deg,#ffb347,#ff6f91);
+    color: #181818;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #ffb34744;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:hover {
+    background: linear-gradient(90deg,#ff6f91,#ffb347);
+}
+
+.hidden {
+    display: none;
+}
+
+.tip {
+    color: #ff6f91;
+    font-style: italic;
+    margin-top: 8px;
+}
+
+.hint {
+    color: #ffb347;
+    font-style: italic;
+    margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<h1>Willkommen zum „Geschenk“-Rätsel 🎂</h1>
+<h2>Beantworte die Fragen richtig, um das Geschenk freizuschalten!</h2>
+
+<!-- 10 Rätselfragen -->
+
+<div id="riddle1" class="riddle-box">
+    <div class="question-title">Frage 1</div>
+    <div class="question-text">
+        <p>Wir gehören zusammen, teilen Erinnerungen, Streiche und Liebe. Manchmal laut, manchmal leise — aber immer verbunden. Wer sind wir?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist die Antwort?</span>
+        <input type="text" id="answer1" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(0)">Antwort prüfen</button>
+        <p id="hint1" class="hidden">Nicht ganz — versuch es nochmal!</p>
+        <p id="tip1" class="hidden">Tipp: Ihr teilt oft den gleichen Nachnamen oder enge Beziehungen.</p>
+    </div>
+</div>
+
+<div id="riddle2" class="riddle-box hidden">
+    <div class="question-title">Frage 2</div>
+    <div class="question-text">
+        <p>Zeit zum Abschalten, neue Orte entdecken und gemeinsame Erinnerungen sammeln. Für viele die schönste Zeit des Jahres. Was ist gemeint?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer2" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(1)">Antwort prüfen</button>
+        <p id="hint2" class="hidden">Nicht richtig — versuch es nochmal!</p>
+        <p id="tip2" class="hidden">Tipp: Viele freuen sich das ganze Jahr darauf und planen Ausflüge.</p>
+    </div>
+</div>
+
+<div id="riddle3" class="riddle-box hidden">
+    <div class="question-title">Frage 3</div>
+    <div class="question-text">
+        <p>Ein Land mit vielen Inseln, freundlichen Leuten. Man kann gut golfen gehen und vieles mehr erleben. Welches Land ist das?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Wo sind wir?</span>
+        <input type="text" id="answer3" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(2)">Antwort prüfen</button>
+        <p id="hint3" class="hidden">Fast — probiere es nochmal!</p>
+        <p id="tip3" class="hidden">Tipp: Ich liege nördlich von Deutschland. Vossis:)</p>
+    </div>
+</div>
+
+<div id="riddle4" class="riddle-box hidden">
+    <div class="question-title">Frage 4</div>
+    <div class="question-text">
+        <p>Die Hauptstadt des Landes aus der vorherigen Frage. Am Nyhavn sitzen Menschen an bunten Häusern und man kann viel vom Wasser aus sehen. Wie heißt diese Stadt?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Welche Stadt ist gemeint?</span>
+        <input type="text" id="answer4" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(3)">Antwort prüfen</button>
+        <p id="hint4" class="hidden">Nicht ganz — versuche es nochmal!</p>
+        <p id="tip4" class="hidden">Tipp: Diese Stadt beginnt mit K und endet auf -hagen.</p>
+    </div>
+</div>
+
+<div id="riddle5" class="riddle-box hidden">
+    <div class="question-title">Frage 5</div>
+    <div class="question-text">
+        <p>Er schrieb Märchen wie „Die kleine Meerjungfrau“ und „Die Schneekönigin“ und ist eng mit dem Land aus Frage 3 verbunden. Wer ist gemeint?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Wer ist das?</span>
+        <input type="text" id="answer5" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(4)">Antwort prüfen</button>
+        <p id="hint5" class="hidden">Fast richtig — versuch's nochmal!</p>
+        <p id="tip5" class="hidden">Tipp: Vorname = Hans Christian.</p>
+    </div>
+</div>
+
+<div id="riddle6" class="riddle-box hidden">
+    <div class="question-title">Frage 6</div>
+    <div class="question-text">
+        <p>Eine Tätigkeit, die Wissen schenkt, Fantasie weckt und dich in andere Welten entführt. Man kann sie leise oder laut ausüben. Was ist gemeint?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer6" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(5)">Antwort prüfen</button>
+        <p id="hint6" class="hidden">Nicht ganz — probiere es nochmal!</p>
+        <p id="tip6" class="hidden">Tipp: Man braucht dafür oft ein Buch oder einen E-Reader.</p>
+    </div>
+</div>
+
+<div id="riddle7" class="riddle-box hidden">
+    <div class="question-title">Frage 7</div>
+    <div class="question-text">
+        <p>Salzig, weit, manchmal stürmisch und manchmal friedlich und idyllisch — fast schon wie ein zuhause so oft wie wir schon dort waren. Was bin ich?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer7" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(6)">Antwort prüfen</button>
+        <p id="hint7" class="hidden">Nicht korrekt — versuche es nochmal!</p>
+        <p id="tip7" class="hidden">Tipp: Es ist nicht ein See, sondern sehr groß und salzig.</p>
+    </div>
+</div>
+
+<div id="riddle8" class="riddle-box hidden">
+    <div class="question-title">Frage 8</div>
+    <div class="question-text">
+        <p>Manchmal treiben es Maschinen voran, manchmal sorgt der Wind für Bewegung. Manchmal ist es wie fliegen. Es bringt uns an Orte und hat schon für viele schöne Erinnerungen gesorgt. Wovon ist hier die Rede?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist gemeint?</span>
+        <input type="text" id="answer8" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(7)">Antwort prüfen</button>
+        <p id="hint8" class="hidden">Versuch's nochmal — noch nicht ganz!</p>
+        <p id="tip8" class="hidden">Tipp: Dieses Wort besteht aus vier Buchstaben und fährt auf dem Wasser.</p>
+    </div>
+</div>
+
+<div id="riddle9" class="riddle-box hidden">
+    <div class="question-title">Frage 9</div>
+    <div class="question-text">
+        <p>In welcher Situation wurde es, wenn du die Antwort der vorangegangenen Frage in betracht ziehst, bei uns am lautesten?</p>
+        <input type="text" id="answer9" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(8)">Antwort prüfen</button>
+        <p id="hint9" class="hidden">Nicht ganz — versuch es nochmal!</p>
+        <p id="tip9" class="hidden">Tipp: Vossi hatte auch schonmal eine wichtige Rolle auf Mallorca.</p>
+    </div>
+</div>
+<div id="riddle10" class="riddle-box hidden">
+    <div class="question-title">Frage 10</div>
+    <div class="question-text">
+        <p>Ein Erlebnis in Kopenhagen: Du sitzt auf dem Wasser, siehst Nyhavn, die kleine Meerjungfrau und viele Brücken — ein gemächlicher Ausflug auf dem Wasser mit deinen Liebsten. Wie nennt man dieses Erlebnis?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer10" class="birthday-input" placeholder="Deine Antwort">
+        <button class="birthday-btn" onclick="checkAnswer(9)">Antwort prüfen</button>
+        <p id="hint10" class="hidden">Nicht ganz — versuch es nochmal!</p>
+        <p id="tip10" class="hidden">Tipp: Zwei Wörter, das erste beschreibt ein Fahrzeug/Erlebnis auf dem Wasser, das zweite ist die Stadt.</p>
+    </div>
+</div>
+
+<div id="final" class="hidden">
+    <h2>🎉 Herzlichen Glückwunsch!</h2>
+    <h2>Du hast alle Rätsel gelöst — das Geschenk lautet: Bootstour in Kopenhagen</h2>
+    <a href="MamisGutschein.png" target="_blank">
+        <button>Gutschein öffnen</button>
+    </a>
+</div>
+
+<script>
+// Allgemeine Logik für die 10 Rätsel
+const answers = [
+    ["familie", "die familie"],
+    ["urlaub"],
+    ["dänemark", "daenemark", "daenmark"],
+    ["kopenhagen", "köpenhamn", "koepenhagen", "köpenhagen"],
+    ["hans christian andersen", "h.c. andersen", "h c andersen", "andersen"],
+    ["lesen", "lesen.", "lesen"],
+    ["meer"],
+    ["boot"],
+    // Keywords for Frage 9 (situation/Action)
+    ["anlegen", "tanken", "manövrieren", "manoevrieren", "landung"],
+    // final
+    ["bootstour in kopenhagen", "bootstour in köpenhagen", "bootstour kopenhagen", "bootstour", "bootstour in kopenhamn"]
+];
+
+const tries = Array(10).fill(0);
+
+function normalize(str) {
+    return str.trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+}
+
+function showNext(currentIndex) {
+    const currentId = 'riddle' + (currentIndex + 1);
+    const nextId = 'riddle' + (currentIndex + 2);
+    document.getElementById(currentId).classList.add('hidden');
+    if(currentIndex + 1 < 10) {
+        document.getElementById(nextId).classList.remove('hidden');
+    } else {
+        document.getElementById('final').classList.remove('hidden');
+    }
+}
+
+function checkAnswer(index) {
+    const input = document.getElementById('answer' + (index + 1)).value || '';
+    const val = normalize(input);
+    // special handling for question 9 (names)
+    let correct = false;
+
+    if(index === 9) {
+        // final: accept various forms containing boot/bootstour and kopenhagen/kopenhagen
+        const hasBoot = val.includes('boot') || val.includes('bootstour');
+        const hasKopenhagen = val.includes('kopenhagen') || val.includes('kopenha') || val.includes('koepenhagen') || val.includes('kopenhagen');
+        if((hasBoot && hasKopenhagen) || val.includes('bootstour')) correct = true;
+    } else {
+        const possibles = answers[index];
+        for(const p of possibles) {
+            if(val === normalize(p) || val.includes(normalize(p))) { correct = true; break; }
+        }
+    }
+
+    const hintEl = document.getElementById('hint' + (index + 1));
+    const tipEl = document.getElementById('tip' + (index + 1));
+
+    if(correct) {
+        // hide hints and move to next
+        if(hintEl) hintEl.classList.add('hidden');
+        if(tipEl) tipEl.classList.add('hidden');
+        showNext(index);
+        tries[index] = 0;
+    } else {
+        tries[index]++;
+        if(hintEl) {
+            hintEl.classList.remove('hidden');
+            // hide the short hint again after 2 seconds
+            setTimeout(() => {
+                hintEl.classList.add('hidden');
+            }, 2000);
+        }
+        if(tries[index] >= 3 && tipEl) tipEl.classList.remove('hidden');
+    }
+}
+</script>
+
+</body>
+</html>
