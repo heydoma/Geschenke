@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Weihnachts Rätsel 🎄</title>
+<style>
+/* Weihnachtliche Farben: Rot (#c41e3a), Grün (#165b33), Gold (#ffd700) */
+@import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+.christmas-input {
+    padding: 14px;
+    font-size: 1.1em;
+    border-radius: 12px;
+    border: 2px solid #ffd700;
+    background: linear-gradient(135deg, #1a0f0f 0%, #0f1a0f 100%);
+    color: #ffd700;
+    -webkit-text-fill-color: #ffd700;
+    -moz-text-fill-color: #ffd700;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3), 0 0 20px rgba(197, 30, 58, 0.2);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.christmas-input:focus {
+    outline: none;
+    border-color: #c41e3a;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5), 0 0 30px rgba(197, 30, 58, 0.4);
+    transform: scale(1.02);
+}
+.christmas-input::placeholder {
+    color: #d4af37;
+    opacity: 0.7;
+    font-weight: 500;
+    -webkit-text-fill-color: #d4af37;
+}
+.christmas-btn {
+    padding: 14px 32px;
+    font-size: 1.15em;
+    border-radius: 12px;
+    border: 2px solid #ffd700;
+    background: linear-gradient(135deg, #c41e3a 0%, #165b33 100%);
+    color: #fff;
+    -webkit-text-fill-color: #fff;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(197, 30, 58, 0.4), 0 0 20px rgba(22, 91, 51, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.christmas-btn:hover {
+    background: linear-gradient(135deg, #165b33 0%, #c41e3a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(197, 30, 58, 0.6), 0 0 30px rgba(22, 91, 51, 0.5);
+}
+.emptytext {
+    color: #d4af37;
+    font-size: 1em;
+    margin-top: 6px;
+    font-style: italic;
+    display: none;
+}
+.headline-gradient {
+    background: linear-gradient(90deg, #c41e3a 0%, #ffd700 50%, #165b33 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+    color: #ffd700;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)) drop-shadow(0 0 20px rgba(197, 30, 58, 0.4));
+    font-weight: 700;
+    font-family: 'Mountains of Christmas', 'Quicksand', cursive;
+}
+.question-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(197, 30, 58, 0.5), 0 2px 5px #000;
+    letter-spacing: 0.05em;
+    font-family: 'Mountains of Christmas', 'Quicksand', cursive;
+}
+
+.question-headline {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin-bottom: 18px;
+    background: linear-gradient(90deg, #c41e3a 0%, #ffd700 50%, #165b33 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)) drop-shadow(0 0 20px rgba(197, 30, 58, 0.4));
+    letter-spacing: 0.05em;
+    font-family: 'Mountains of Christmas', 'Quicksand', cursive;
+}
+.question-text {
+    font-size: 1.2em;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #c41e3a 0%, #ffd700 50%, #165b33 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2), 0 0 30px rgba(197, 30, 58, 0.15);
+    padding: 20px 18px;
+    font-family: 'Quicksand', sans-serif;
+    animation: fadeInCard 0.7s;
+    color: #ffd700;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5)) drop-shadow(0 2px 5px #000);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+}
+   
+@keyframes fadeInCard {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes snowfall {
+    0% { transform: translateY(-10vh) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(360deg); }
+}
+
+.riddle-box p {
+    font-size: 1.18em;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    color: #f7f7f7;
+    letter-spacing: 0.02em;
+}
+
+.riddle-box input {
+    margin-bottom: 18px;
+}
+
+.riddle-box button {
+    margin-top: 8px;
+}
+
+.riddle-box h2, .riddle-box h3 {
+    color: #d4af37;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.riddle-box .tip {
+    color: #c41e3a;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 1em;
+}
+
+.riddle-box .hint {
+    color: #d4af37;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 1em;
+}
+body {
+    font-family: 'Quicksand', 'Arial', sans-serif;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(197, 30, 58, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(22, 91, 51, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+        linear-gradient(135deg, #0a1f0a 0%, #1a0a0a 50%, #0a0a1a 100%);
+    color: #f7f7f7;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+.christmas-snow {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.snowflake {
+    position: absolute;
+    top: -10px;
+    color: #fff;
+    font-size: 1em;
+    opacity: 0.8;
+    animation: snowfall linear infinite;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+}
+
+.star {
+    position: absolute;
+    color: #ffd700;
+    font-size: 1.5em;
+    opacity: 0.6;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.2); }
+}
+
+h1 {
+    font-size: 3em;
+    background: linear-gradient(135deg, #c41e3a 0%, #ffd700 50%, #165b33 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 25px rgba(197, 30, 58, 0.6)) drop-shadow(0 4px 10px #000);
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+    font-family: 'Mountains of Christmas', 'Quicksand', cursive;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)) drop-shadow(0 0 20px rgba(197, 30, 58, 0.4)); }
+    to { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1)) drop-shadow(0 0 30px rgba(197, 30, 58, 0.8)); }
+}
+
+h2 {
+    font-size: 1.7em;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(22, 91, 51, 0.5), 0 2px 5px #000;
+    margin-bottom: 35px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 0.03em;
+}
+
+.riddle-box {
+    background: linear-gradient(135deg, rgba(26, 15, 15, 0.95) 0%, rgba(15, 26, 15, 0.95) 100%);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 3px rgba(255, 215, 0, 0.3),
+        inset 0 0 30px rgba(197, 30, 58, 0.1),
+        inset 0 0 30px rgba(22, 91, 51, 0.1);
+    padding: 35px 28px 28px 28px;
+    margin: 30px auto;
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+}
+
+.riddle-box::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(135deg, #c41e3a 0%, #ffd700 50%, #165b33 100%);
+    border-radius: 20px;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.hidden {
+    display: none;
+}
+
+.tip {
+    color: #c41e3a;
+    font-style: italic;
+    margin-top: 8px;
+}
+
+.hint {
+    color: #d4af37;
+    font-style: italic;
+    margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="christmas-snow" id="snowContainer"></div>
+
+<h1>🎄 Willkommen zum Weihnachts-Rätsel 🎁</h1>
+<h2>Beantworte die Fragen richtig, um dein Geschenk freizuschalten!</h2>
+
+<!-- 10 Weihnachts-Rätsel -->
+
+<div id="riddle1" class="riddle-box">
+    <div class="question-title">Frage 1 🎄</div>
+    <div class="question-text">
+        <p>Ich komme jedes Jahr, bringe Zeit statt Eile, und die besten Geschenke kann man nicht einpacken. Was bin ich?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist die Antwort?</span>
+        <input type="text" id="answer1" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(0)">Antwort prüfen</button>
+        <p id="hint1" class="hint hidden">Nicht ganz — versuch es nochmal!</p>
+        <p id="tip1" class="tip hidden">Tipp: Es ist kein Gegenstand.</p>
+    </div>
+</div>
+
+<div id="riddle2" class="riddle-box hidden">
+    <div class="question-title">Frage 2 ⛳</div>
+    <div class="question-text">
+        <p>Ich habe viele Wege, aber keine Autos. Ich bin grün, aber kein Park. Man kommt voran, ohne wirklich zu reisen. Was bin ich?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer2" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(1)">Antwort prüfen</button>
+        <p id="hint2" class="hint hidden">Nicht richtig — versuch es nochmal!</p>
+        <p id="tip2" class="tip hidden">Tipp: Denkt an Sport.</p>
+    </div>
+</div>
+
+<div id="riddle3" class="riddle-box hidden">
+    <div class="question-title">Frage 3 ⛳</div>
+    <div class="question-text">
+        <p>Was bleibt beim Golf immer gleich, egal ob Anfänger oder Profi, und entscheidet trotzdem über Sieg oder Niederlage?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist gemeint?</span>
+        <input type="text" id="answer3" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(2)">Antwort prüfen</button>
+        <p id="hint3" class="hint hidden">Fast — probiere es nochmal!</p>
+        <p id="tip3" class="tip hidden">Tipp: Ohne Ziel kein Spiel.</p>
+    </div>
+</div>
+
+<div id="riddle4" class="riddle-box hidden">
+    <div class="question-title">Frage 4 ⛳</div>
+    <div class="question-text">
+        <p>Ich bin kein Motor, erhöhe aber Geschwindigkeit. Ich bin unsichtbar, aber entscheidend. Zu viel von mir ist genauso schlecht wie zu wenig.</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was bin ich?</span>
+        <input type="text" id="answer4" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(3)">Antwort prüfen</button>
+        <p id="hint4" class="hint hidden">Nicht ganz — versuche es nochmal!</p>
+        <p id="tip4" class="tip hidden">Tipp: Der Ball verrät es.</p>
+    </div>
+</div>
+
+<div id="riddle5" class="riddle-box hidden">
+    <div class="question-title">Frage 5 🏌️‍♂️</div>
+    <div class="question-text">
+        <p>Ich stehe für Innovation, meine Driver haben Namen statt nur Nummern, und Profis vertrauen mir seit Jahrzehnten. Wer bin ich?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Welche Marke?</span>
+        <input type="text" id="answer5" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(4)">Antwort prüfen</button>
+        <p id="hint5" class="hint hidden">Fast richtig — versuch's nochmal!</p>
+        <p id="tip5" class="tip hidden">Tipp: Eine der bekanntesten Golfmarken der Welt.</p>
+    </div>
+</div>
+
+<div id="riddle6" class="riddle-box hidden">
+    <div class="question-title">Frage 6 🎟️</div>
+    <div class="question-text">
+        <p>Wir waren schon dort, um Neues zu entdecken, Trends zu sehen, und am Ende mehr Gespräche als Taschen mitgenommen zu haben. Was war das?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer6" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(5)">Antwort prüfen</button>
+        <p id="hint6" class="hint hidden">Nicht ganz — probiere es nochmal!</p>
+        <p id="tip6" class="tip hidden">Tipp: Denkt an OMR und die Spirituosenmesse.</p>
+    </div>
+</div>
+
+<div id="riddle7" class="riddle-box hidden">
+    <div class="question-title">Frage 7 🤝</div>
+    <div class="question-text">
+        <p>Man kann es nicht kaufen, nicht online bestellen, und trotzdem nimmt man es immer mit nach Hause. Was ist es?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist das?</span>
+        <input type="text" id="answer7" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(6)">Antwort prüfen</button>
+        <p id="hint7" class="hint hidden">Nicht korrekt — versuche es nochmal!</p>
+        <p id="tip7" class="tip hidden">Tipp: Entsteht durch gemeinsame Erlebnisse.</p>
+    </div>
+</div>
+
+<div id="riddle8" class="riddle-box hidden">
+    <div class="question-title">Frage 8 🇩🇰</div>
+    <div class="question-text">
+        <p>Ich trage mehr, als man denkt, fehle ich, merkt man es sofort. Einmal blieb ich zurück, und ein Umweg rettete den Tag. Was bin ich?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist gemeint?</span>
+        <input type="text" id="answer8" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(7)">Antwort prüfen</button>
+        <p id="hint8" class="hint hidden">Versuch's nochmal — noch nicht ganz!</p>
+        <p id="tip8" class="tip hidden">Tipp: Auf dem Platz unverzichtbar.</p>
+    </div>
+</div>
+
+<div id="riddle9" class="riddle-box hidden">
+    <div class="question-title">Frage 9 🧩</div>
+    <div class="question-text">
+        <p>Was verbindet Schläger von TaylorMade, das Erlebnis aus Dänemark und die Gespräche aus den Messehallen?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Was ist der rote Faden?</span>
+        <input type="text" id="answer9" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(8)">Antwort prüfen</button>
+        <p id="hint9" class="hint hidden">Nicht ganz — versuch es nochmal!</p>
+        <p id="tip9" class="tip hidden">Tipp: Der rote Faden durch alle Rätsel.</p>
+    </div>
+</div>
+
+<div id="riddle10" class="riddle-box hidden">
+    <div class="question-title">Frage 10 🎯</div>
+    <div class="question-text">
+        <p>Wo sieht man neue Schläger, testet Innovationen, findet Zubehör wie Trolleys und plant die nächsten gemeinsamen Erlebnisse?</p>
+        <span class="question-headline headline-gradient" style="display:block;margin-top:18px;">Wo führt euch der Gutschein hin?</span>
+        <input type="text" id="answer10" class="christmas-input" placeholder="Deine Antwort">
+        <button class="christmas-btn" onclick="checkAnswer(9)">Antwort prüfen</button>
+        <p id="hint10" class="hint hidden">Nicht ganz — versuch es nochmal!</p>
+        <p id="tip10" class="tip hidden">Tipp: Genau dort führt euch euer Gutschein hin.</p>
+    </div>
+</div>
+
+<div id="final" class="hidden">
+    <h2>🎉 Frohe Weihnachten! 🎄</h2>
+    <h2>Du hast alle Rätsel gelöst!</h2>
+    <p style="font-size: 1.3em; color: #d4af37; margin: 20px 0;">Dein Geschenk: Hanse Golf in den Messehallen Hamburg + Essen im KÖrri!</p>
+    <a href="weinachtsgeschenk25.png" target="_blank">
+        <button class="christmas-btn">Gutschein öffnen 🎁</button>
+    </a>
+</div>
+
+<script>
+// Schneeflocken und Sterne Animation
+function createSnowflakes() {
+    const container = document.getElementById('snowContainer');
+    const snowflakeCount = 60;
+    const starCount = 20;
+
+    // Schneeflocken
+    for(let i = 0; i < snowflakeCount; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.innerHTML = '❄';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        snowflake.style.animationDelay = Math.random() * 5 + 's';
+        snowflake.style.fontSize = (Math.random() * 15 + 10) + 'px';
+        snowflake.style.opacity = Math.random() * 0.6 + 0.4;
+        container.appendChild(snowflake);
+    }
+
+    // Weihnachtssterne
+    for(let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.innerHTML = '✨';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.fontSize = (Math.random() * 10 + 15) + 'px';
+        container.appendChild(star);
+    }
+}
+
+createSnowflakes();
+
+// Rätsel-Logik mit flexiblen Antworten
+const answers = [
+    // Frage 1: Weihnachten
+    ["weihnachten", "weihnacht"],
+
+    // Frage 2: Golfplatz
+    ["golfplatz", "golf platz", "ein golfplatz", "der golfplatz"],
+
+    // Frage 3: Das Loch
+    ["loch", "das loch", "ein loch"],
+
+    // Frage 4: Spin
+    ["spin", "der spin"],
+
+    // Frage 5: TaylorMade (nur exakt diese Marke)
+    ["taylormade", "taylor made"],
+
+    // Frage 6: Messe
+    ["messe", "eine messe", "die messe"],
+
+    // Frage 7: Erinnerung
+    ["erinnerung", "erinnerungen", "die erinnerung"],
+
+    // Frage 8: Trolley
+    ["trolley", "der trolley", "ein trolley", "caddy"],
+
+    // Frage 9: Golf
+    ["golf"],
+
+    // Frage 10: Golfmesse (Schlüsselwörter)
+    ["golfmesse", "golf messe", "messe", "hanse golf", "hansegolf"]
+];
+
+const tries = Array(10).fill(0);
+
+function normalize(str) {
+    return str.trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+}
+
+function showNext(currentIndex) {
+    const currentId = 'riddle' + (currentIndex + 1);
+    const nextId = 'riddle' + (currentIndex + 2);
+    document.getElementById(currentId).classList.add('hidden');
+    if(currentIndex + 1 < 10) {
+        document.getElementById(nextId).classList.remove('hidden');
+    } else {
+        document.getElementById('final').classList.remove('hidden');
+    }
+}
+
+function checkAnswer(index) {
+    const input = document.getElementById('answer' + (index + 1)).value || '';
+    const val = normalize(input);
+    let correct = false;
+
+    const possibles = answers[index];
+
+    // Spezielle Logik für Frage 10 (Golfmesse)
+    if(index === 9) {
+        // Akzeptiere wenn "golf" UND "messe" enthalten sind, oder "hanse golf"
+        const hasGolf = val.includes('golf');
+        const hasMesse = val.includes('messe');
+        const hasHanse = val.includes('hanse');
+
+        if((hasGolf && hasMesse) || (hasHanse && hasGolf) || val.includes('golfmesse') || val.includes('hansegolf')) {
+            correct = true;
+        }
+    }
+    // Normale Logik für alle anderen Fragen
+    else {
+        for(const p of possibles) {
+            if(val === normalize(p) || val.includes(normalize(p))) {
+                correct = true;
+                break;
+            }
+        }
+    }
+
+    const hintEl = document.getElementById('hint' + (index + 1));
+    const tipEl = document.getElementById('tip' + (index + 1));
+
+    if(correct) {
+        if(hintEl) hintEl.classList.add('hidden');
+        if(tipEl) tipEl.classList.add('hidden');
+        showNext(index);
+        tries[index] = 0;
+    } else {
+        tries[index]++;
+        if(hintEl) {
+            hintEl.classList.remove('hidden');
+            setTimeout(() => {
+                hintEl.classList.add('hidden');
+            }, 2000);
+        }
+        if(tries[index] >= 3 && tipEl) tipEl.classList.remove('hidden');
+    }
+}
+</script>
+
+</body>
+</html>
+
