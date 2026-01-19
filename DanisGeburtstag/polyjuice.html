@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Das Polyjuice-Labor</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Georgia', serif;
+    color: #f5e6d3;
+}
+
+.game-container {
+    max-width: 900px;
+    padding: 40px;
+    background: rgba(26, 26, 46, 0.9);
+    border: 3px solid #8b7355;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.game-title {
+    text-align: center;
+    font-size: 32px;
+    color: #ffd700;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hints-section {
+    background: rgba(245, 230, 211, 0.1);
+    border: 2px dashed #8b7355;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.hints-title {
+    font-size: 18px;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.hint {
+    margin: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    color: #d4c4a8;
+}
+
+.hint::before {
+    content: "📜";
+    position: absolute;
+    left: 0;
+}
+
+.cauldrons-area {
+    display: flex;
+    justify-content: space-around;
+    margin: 40px 0;
+    padding: 30px;
+    background: rgba(139, 115, 85, 0.1);
+    border-radius: 8px;
+}
+
+.cauldron-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.cauldron {
+    width: 140px;
+    height: 160px;
+    background: linear-gradient(135deg, #4a3728, #2a1810);
+    border: 4px solid #8b7355;
+    border-radius: 50% 50% 45% 45%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.cauldron.drop-target {
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), inset 0 -10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.cauldron.success {
+    border-color: #4ade80;
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.6);
+    animation: successPulse 0.5s ease;
+}
+
+.cauldron.error {
+    animation: explosion 0.5s ease;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes explosion {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.15); }
+    50% { transform: scale(0.95); }
+    75% { transform: scale(1.1); }
+}
+
+.cauldron-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #8b7355;
+    text-transform: uppercase;
+}
+
+.cauldron-content {
+    font-size: 48px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.ingredients-area {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 30px;
+    background: rgba(139, 115, 85, 0.1);
+    border-radius: 8px;
+    min-height: 140px;
+}
+
+.ingredient {
+    width: 120px;
+    height: 120px;
+    background: rgba(139, 115, 85, 0.3);
+    border: 3px solid #8b7355;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: grab;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.ingredient:hover {
+    border-color: #ffd700;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(255, 215, 0, 0.3);
+}
+
+.ingredient.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.ingredient.placed {
+    display: none;
+}
+
+.ingredient-icon {
+    font-size: 48px;
+}
+
+.ingredient-name {
+    font-size: 14px;
+    color: #f5e6d3;
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: 2px solid #8b7355;
+    background: rgba(139, 115, 85, 0.3);
+    color: #f5e6d3;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: 'Georgia', serif;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: rgba(139, 115, 85, 0.5);
+    border-color: #ffd700;
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px 50px;
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.message.show {
+    opacity: 1;
+}
+
+.message.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1 class="game-title">🧪 Das Polyjuice-Labor</h1>
+
+    <!-- Hints Section -->
+    <div class="hints-section">
+        <div class="hints-title">Zerrissene Notizen:</div>
+        <div class="hint">Fluxkraut darf nicht in den Kupferkessel.</div>
+        <div class="hint">Der Kessel mit den Blutegeln steht rechts vom Eisenkessel.</div>
+        <div class="hint">Florfliegen benötigen die höchste Temperatur. (Stein = höchste Temperatur)</div>
+    </div>
+
+    <!-- Cauldrons Area -->
+    <div class="cauldrons-area">
+        <div class="cauldron-slot">
+            <div class="cauldron" data-cauldron="copper" data-temp="low"></div>
+            <div class="cauldron-label">Kupfer</div>
+        </div>
+        <div class="cauldron-slot">
+            <div class="cauldron" data-cauldron="iron" data-temp="medium"></div>
+            <div class="cauldron-label">Eisen</div>
+        </div>
+        <div class="cauldron-slot">
+            <div class="cauldron" data-cauldron="tin" data-temp="medium-high"></div>
+            <div class="cauldron-label">Zinn</div>
+        </div>
+        <div class="cauldron-slot">
+            <div class="cauldron" data-cauldron="stone" data-temp="highest"></div>
+            <div class="cauldron-label">Stein</div>
+        </div>
+    </div>
+
+    <!-- Ingredients Area -->
+    <div class="ingredients-area" id="ingredientsArea">
+        <div class="ingredient" draggable="true" data-ingredient="lacewing">
+            <div class="ingredient-icon">🦋</div>
+            <div class="ingredient-name">Florfliegen</div>
+        </div>
+        <div class="ingredient" draggable="true" data-ingredient="leech">
+            <div class="ingredient-icon">🩸</div>
+            <div class="ingredient-name">Blutegel</div>
+        </div>
+        <div class="ingredient" draggable="true" data-ingredient="fluxweed">
+            <div class="ingredient-icon">🌿</div>
+            <div class="ingredient-name">Fluxkraut</div>
+        </div>
+        <div class="ingredient" draggable="true" data-ingredient="knotgrass">
+            <div class="ingredient-icon">🌾</div>
+            <div class="ingredient-name">Knöterich</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn" onclick="game.reset()">🔄 Zurücksetzen</button>
+        <button class="btn" onclick="game.check()" id="checkBtn">✓ Prüfen</button>
+    </div>
+</div>
+
+<div class="message" id="message"></div>
+
+<script>
+// ========================================
+// POLYJUICE LABOR - GAME LOGIC
+// ========================================
+
+const game = (() => {
+    // Game State
+    let state = 'idle'; // idle | placing | checking | success | reset
+
+    // Solution (fixed, immutable)
+    const SOLUTION = {
+        copper: 'knotgrass',  // Fluxkraut NICHT in Kupfer → Knöterich
+        iron: 'fluxweed',     // Blutegel rechts von Eisen → Eisen = Fluxkraut
+        tin: 'leech',         // Blutegel rechts von Eisen → Zinn = Blutegel
+        stone: 'lacewing'     // Florfliegen = höchste Temp → Stein
+    };
+
+    // Current placements
+    const placements = {
+        copper: null,
+        iron: null,
+        tin: null,
+        stone: null
+    };
+
+    // DOM Elements
+    let cauldrons, ingredients, checkBtn, messageEl;
+
+    // Initialize
+    function init() {
+        cauldrons = document.querySelectorAll('.cauldron');
+        ingredients = document.querySelectorAll('.ingredient');
+        checkBtn = document.getElementById('checkBtn');
+        messageEl = document.getElementById('message');
+
+        setupDragAndDrop();
+        updateCheckButton();
+    }
+
+    // Setup Drag & Drop
+    function setupDragAndDrop() {
+        let draggedIngredient = null;
+
+        // Ingredient drag events
+        ingredients.forEach(ingredient => {
+            ingredient.addEventListener('dragstart', (e) => {
+                if (state === 'checking' || state === 'success') return;
+
+                draggedIngredient = ingredient;
+                ingredient.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            ingredient.addEventListener('dragend', () => {
+                ingredient.classList.remove('dragging');
+                draggedIngredient = null;
+            });
+        });
+
+        // Cauldron drop events
+        cauldrons.forEach(cauldron => {
+            cauldron.addEventListener('dragover', (e) => {
+                if (state === 'checking' || state === 'success') return;
+                e.preventDefault();
+                cauldron.classList.add('drop-target');
+            });
+
+            cauldron.addEventListener('dragleave', () => {
+                cauldron.classList.remove('drop-target');
+            });
+
+            cauldron.addEventListener('drop', (e) => {
+                e.preventDefault();
+                cauldron.classList.remove('drop-target');
+
+                if (!draggedIngredient || state === 'checking' || state === 'success') return;
+
+                const cauldronType = cauldron.dataset.cauldron;
+                const ingredientType = draggedIngredient.dataset.ingredient;
+
+                // Check if cauldron already has ingredient
+                if (placements[cauldronType] !== null) {
+                    showMessage('Dieser Kessel ist bereits belegt!', 'error');
+                    return;
+                }
+
+                // Place ingredient
+                placeIngredient(cauldronType, ingredientType, draggedIngredient);
+            });
+        });
+    }
+
+    // Place ingredient in cauldron
+    function placeIngredient(cauldronType, ingredientType, ingredientElement) {
+        state = 'placing';
+
+        // Update placements
+        placements[cauldronType] = ingredientType;
+
+        // Update UI
+        const cauldron = document.querySelector(`[data-cauldron="${cauldronType}"]`);
+        const icon = ingredientElement.querySelector('.ingredient-icon').textContent;
+
+        const content = document.createElement('div');
+        content.className = 'cauldron-content';
+        content.textContent = icon;
+        cauldron.appendChild(content);
+
+        // Hide ingredient from ingredients area
+        ingredientElement.classList.add('placed');
+
+        state = 'idle';
+        updateCheckButton();
+    }
+
+    // Update check button state
+    function updateCheckButton() {
+        const allPlaced = Object.values(placements).every(p => p !== null);
+        checkBtn.disabled = !allPlaced || state === 'checking' || state === 'success';
+    }
+
+    // Check solution
+    function check() {
+        if (state === 'checking' || state === 'success') return;
+
+        const allPlaced = Object.values(placements).every(p => p !== null);
+        if (!allPlaced) {
+            showMessage('Platziere erst alle Zutaten!', 'error');
+            return;
+        }
+
+        state = 'checking';
+        checkBtn.disabled = true;
+
+        // Check if solution is correct
+        const isCorrect = Object.keys(SOLUTION).every(
+            cauldron => placements[cauldron] === SOLUTION[cauldron]
+        );
+
+        if (isCorrect) {
+            handleSuccess();
+        } else {
+            handleError();
+        }
+    }
+
+    // Handle success
+    function handleSuccess() {
+        state = 'success';
+
+        // Animate cauldrons
+        cauldrons.forEach(cauldron => {
+            cauldron.classList.add('success');
+        });
+
+        // Show success message
+        setTimeout(() => {
+            showMessage('✨ Perfekt! Der Vielsaft-Trank ist gelungen!', 'success');
+        }, 500);
+    }
+
+    // Handle error
+    function handleError() {
+        // Animate explosion
+        cauldrons.forEach(cauldron => {
+            cauldron.classList.add('error');
+        });
+
+        showMessage('💥 BOOM! Falsche Kombination!', 'error');
+
+        // Reset after animation
+        setTimeout(() => {
+            reset();
+        }, 1000);
+    }
+
+    // Reset game
+    function reset() {
+        state = 'reset';
+
+        // Clear placements
+        Object.keys(placements).forEach(key => {
+            placements[key] = null;
+        });
+
+        // Clear cauldron contents
+        cauldrons.forEach(cauldron => {
+            cauldron.classList.remove('success', 'error', 'drop-target');
+            const content = cauldron.querySelector('.cauldron-content');
+            if (content) content.remove();
+        });
+
+        // Show all ingredients again
+        ingredients.forEach(ingredient => {
+            ingredient.classList.remove('placed', 'dragging');
+        });
+
+        state = 'idle';
+        updateCheckButton();
+    }
+
+    // Show message
+    function showMessage(text, type = 'success') {
+        messageEl.textContent = text;
+        messageEl.className = `message ${type}`;
+        messageEl.classList.add('show');
+
+        setTimeout(() => {
+            messageEl.classList.remove('show');
+        }, 2000);
+    }
+
+    // Public API
+    return {
+        init,
+        check,
+        reset
+    };
+})();
+
+// Initialize game on load
+document.addEventListener('DOMContentLoaded', () => {
+    game.init();
+});
+</script>
+</body>
+</html>
+
+
