@@ -534,11 +534,11 @@ svg { width: 100%; height: 100%; display: block; }
     </div>
 </div>
 
-<!-- Minigame 2: Audio Balance -->
+<!-- Minigame 2: Die Flüsternden Buchrücken -->
 <div class="minigame-modal" id="minigame2">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 600px;">
         <div class="modal-header">
-            <h2 class="modal-title">🔊 Muffliato – Audio-Balance</h2>
+            <h2 class="modal-title">📚 Die flüsternden Buchrücken</h2>
             <div class="modal-controls">
                 <button class="btn btn-hint" onclick="showHint(2)">💡 Hinweis</button>
                 <button class="btn btn-reset" onclick="resetMinigame(2)">🔄 Reset</button>
@@ -546,31 +546,24 @@ svg { width: 100%; height: 100%; display: block; }
             </div>
         </div>
         <div class="modal-body">
-            <p style="text-align: center; margin-bottom: 20px;">Balance die Geräusche, bis nur eine Stimme übrig bleibt...</p>
-            <div id="audioSliders"></div>
+            <div id="whisperingBooksContainer"></div>
         </div>
     </div>
 </div>
 
 <!-- Minigame 3: Bibliothekars-Chiffre -->
 <div class="minigame-modal" id="minigame3">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 750px;">
         <div class="modal-header">
             <h2 class="modal-title">📜 Die Bibliothekars-Chiffre</h2>
             <div class="modal-controls">
                 <button class="btn btn-hint" onclick="showHint(3)">💡 Hinweis</button>
-                <button class="btn btn-reset" onclick="resetMinigame(3)">🔄 Reset</button>
+                <button class="btn btn-reset" onclick="librarianCipher.reset()">🔄 Reset</button>
                 <button class="btn btn-close" onclick="closeMinigame(3)">✕</button>
             </div>
         </div>
         <div class="modal-body">
-            <div class="context-hints">
-                <p>🔍 Kontext-Hinweise:</p>
-                <p>"Die Stadt an der Elbe: _ _ M _ _ _ _"</p>
-                <p>"Wo das Musical spielt: H _ _ _ U _ _"</p>
-            </div>
-            <div id="cipherGrid"></div>
-            <div id="decryptedText">_ _ _ _ _ _ _</div>
+            <div id="cipherContainer"></div>
         </div>
     </div>
 </div>
@@ -673,6 +666,15 @@ svg { width: 100%; height: 100%; display: block; }
     </div>
 </div>
 
-<script src="minigames.js"></script>
+<!-- Minigame Scripts (modular) -->
+<script src="games/minigames-core.js"></script>
+<script src="games/game1-polyjuice.js"></script>
+<script src="games/game2-muffliato.js"></script>
+<script src="games/game3-cipher.js"></script>
+<script src="games/game4-staircase.js"></script>
+<script src="games/game5-invisibleink.js"></script>
+<script src="games/game6-bells.js"></script>
+<script src="games/game7-booksort.js"></script>
+<script src="games/game8-pensieve.js"></script>
 </body>
 </html>
