@@ -425,45 +425,380 @@
 }
 
 /* ========================================
-   MINIGAME 4: STAIRCASE
+   MINIGAME 4: ROTIERENDE TREPPEN
    ======================================== */
 
-#staircaseGrid {
+/* Container */
+#staircaseContainer {
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rs-puzzle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.rs-grid {
     position: relative;
     width: 500px;
     height: 400px;
-    margin: 20px auto;
 }
 
-.stair-tile {
+/* Segment (isometrische Treppe) */
+.rs-segment {
     position: absolute;
     width: 80px;
-    height: 40px;
-    background: linear-gradient(135deg, #5c4033, #3d2817);
-    border: 2px solid #8b7355;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    height: 50px;
+    cursor: default;
+    transition: all 0.4s ease;
     transform-style: preserve-3d;
 }
 
-.stair-tile.inactive {
-    background: linear-gradient(135deg, #2a1810, #1a0f08);
-    opacity: 0.5;
+.rs-segment-top {
+    position: absolute;
+    width: 80px;
+    height: 50px;
+    background: linear-gradient(135deg, #4a3728 0%, #2d1f14 100%);
+    border: 2px solid #6b5344;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #d4c4a8;
+    z-index: 2;
+    box-shadow: inset 0 2px 8px rgba(255, 215, 0, 0.1);
 }
 
-.stair-tile.player {
-    background: linear-gradient(135deg, #ffd700, #ff8c00);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+.rs-segment-front {
+    position: absolute;
+    width: 80px;
+    height: 20px;
+    top: 48px;
+    background: linear-gradient(180deg, #3d2817 0%, #1a0f08 100%);
+    border: 2px solid #6b5344;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 1;
 }
 
-.stair-tile.goal {
-    background: linear-gradient(135deg, #4ade80, #22c55e);
-    box-shadow: 0 0 20px rgba(74, 222, 128, 0.6);
+.rs-segment-side {
+    position: absolute;
+    width: 20px;
+    height: 50px;
+    left: 78px;
+    background: linear-gradient(90deg, #2d1f14 0%, #1a0f08 100%);
+    border: 2px solid #6b5344;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    transform: skewY(-30deg);
+    transform-origin: top left;
+    z-index: 1;
 }
 
-.stair-tile:hover:not(.inactive) {
-    transform: translateY(-5px);
+/* Start & Ziel */
+.rs-segment.rs-start .rs-segment-top {
+    background: linear-gradient(135deg, #2d5a27 0%, #1a3a17 100%);
+    border-color: #4ade80;
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+}
+
+.rs-segment.rs-goal .rs-segment-top {
+    background: linear-gradient(135deg, #5a4a27 0%, #3a3017 100%);
     border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    animation: goalPulse 2s ease-in-out infinite;
+}
+
+@keyframes goalPulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
+}
+
+/* Aktuelle Position */
+.rs-segment.rs-current .rs-segment-top {
+    border-color: #60a5fa;
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+}
+
+/* Erreichbare Felder */
+.rs-segment.rs-reachable {
+    cursor: pointer;
+}
+
+.rs-segment.rs-reachable .rs-segment-top {
+    border-color: #a78bfa;
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.6);
+    animation: reachablePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes reachablePulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(167, 139, 250, 0.6); }
+    50% { box-shadow: 0 0 30px rgba(167, 139, 250, 0.9); }
+}
+
+/* Hover auf erreichbares Feld */
+.rs-segment.rs-reachable:hover .rs-segment-top {
+    background: linear-gradient(135deg, #5a3a50 0%, #3d2040 100%);
+    border-color: #c4b5fd;
+    transform: translateY(-6px);
+    box-shadow: 0 8px 25px rgba(167, 139, 250, 0.7);
+    animation: none;
+}
+
+.rs-segment.rs-reachable:hover .rs-segment-front,
+.rs-segment.rs-reachable:hover .rs-segment-side {
+    filter: brightness(1.2);
+}
+
+/* Klick-Feedback */
+.rs-segment.rs-clicked .rs-segment-top {
+    transform: scale(0.95);
+    background: rgba(255, 215, 0, 0.3);
+}
+
+/* Rotiert-Zustand */
+.rs-segment.rs-rotated .rs-segment-top {
+    background: linear-gradient(225deg, #4a3728 0%, #2d1f14 100%);
+}
+
+/* Wird-rotieren-Vorschau (SEHR WICHTIG für UX) */
+.rs-segment.rs-will-rotate .rs-segment-top {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+    animation: willRotatePreview 1.5s ease-in-out infinite;
+}
+
+@keyframes willRotatePreview {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+/* Gerade rotierend (während der Animation) */
+.rs-segment.rs-rotating-now .rs-segment-top {
+    border-color: #f59e0b;
+    animation: rotatingNow 0.6s ease-in-out;
+}
+
+@keyframes rotatingNow {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(45deg) scale(1.1); border-color: #ffd700; }
+    100% { transform: rotate(90deg) scale(1); }
+}
+
+/* Ziel pulsiert wenn Spieler näher kommt */
+.rs-segment.rs-goal.rs-approaching .rs-segment-top {
+    animation: approachingGoal 0.6s ease-out;
+}
+
+@keyframes approachingGoal {
+    0% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1); transform: scale(1.1); }
+    100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+}
+
+/* Fortschritts-Puls nach Bewegung */
+.rs-segment.rs-goal.rs-pulse-progress .rs-segment-top {
+    animation: pulseProgress 0.6s ease-out;
+}
+
+@keyframes pulseProgress {
+    0% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 50px rgba(255, 215, 0, 1); transform: scale(1.15); }
+    100% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
+}
+
+/* Connector-Dots (zeigen Verbindungsrichtungen) */
+.rs-connector-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 215, 0, 0.6);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+}
+
+.rs-segment.rs-will-rotate .rs-connector-dot {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+}
+
+/* Segment-Symbol (A/B) */
+.rs-segment-symbol {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Gelöst */
+.rs-segment.rs-solved .rs-segment-top {
+    border-color: #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    animation: solvedGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes solvedGlow {
+    0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+    100% { box-shadow: 0 0 50px rgba(255, 215, 0, 1); }
+}
+
+/* Spieler */
+.rs-player {
+    position: absolute;
+    width: 80px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    z-index: 10;
+    transition: left 0.4s ease, top 0.4s ease;
+}
+
+.rs-player-body {
+    font-size: 36px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    animation: playerFloat 2s ease-in-out infinite;
+}
+
+@keyframes playerFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.rs-player.rs-moving .rs-player-body {
+    animation: playerMove 0.4s ease-in-out;
+}
+
+@keyframes playerMove {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-15px) scale(1.1); }
+    100% { transform: translateY(0); }
+}
+
+.rs-player.rs-falling .rs-player-body {
+    animation: playerFall 1.4s ease-in forwards;
+}
+
+@keyframes playerFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    30% { transform: translateY(10px) rotate(15deg); opacity: 1; }
+    60% { transform: translateY(80px) rotate(180deg); opacity: 0.6; }
+    100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+}
+
+/* Info-Bereich */
+.rs-info {
+    text-align: center;
+    padding: 15px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    border: 1px solid #8b7355;
+}
+
+.rs-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.rs-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #d4c4a8;
+}
+
+.rs-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.rs-dot-start { background: #4ade80; }
+.rs-dot-goal { background: #ffd700; }
+.rs-dot-reachable { background: #a78bfa; }
+.rs-dot-rotate { background: #f59e0b; }
+
+.rs-hint {
+    color: #d4c4a8;
+    font-size: 14px;
+    margin: 8px 0;
+}
+
+.rs-warning {
+    color: #f59e0b;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Erfolgs-Overlay */
+.rs-success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 100;
+}
+
+.rs-success-overlay.rs-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.rs-success-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    animation: successAppear 0.5s ease-out;
+}
+
+@keyframes successAppear {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.rs-success-title {
+    font-size: 24px;
+    color: #ffd700;
+    margin-bottom: 15px;
+}
+
+.rs-success-text {
+    color: #d4c4a8;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.rs-success-icon {
+    font-size: 64px;
+    animation: iconBounce 1s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 /* ========================================
@@ -671,8 +1006,14 @@
         flex-wrap: wrap;
     }
 
-    #staircaseGrid {
-        transform: scale(0.8);
+    /* Rotierende Treppen responsive */
+    .rs-grid {
+        transform: scale(0.75);
+        transform-origin: top center;
+    }
+    
+    .rs-puzzle {
+        gap: 10px;
     }
 
     #bookShelf {
