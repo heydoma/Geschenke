@@ -481,8 +481,8 @@ function createDesk() {
     scene.add(openBook);
     
     // === DIE KARTE DER VERBORGENEN WEGE ===
-    // Move to a different spot on desk (not under candlestick)
-    createMagicMap(x + 0.8, 0.97, z + 0.3);
+    // Center of desk
+    createMagicMap(x, 0.97, z);
     
     addCollider(x, 0.5, z, 3.8, 1, 2);
     
@@ -862,9 +862,10 @@ function createPotionShelf() {
 }
 
 function createAlchemyStation() {
-    // Position against right wall
+    // Position against front wall under right window (z=-4 window)
     const w = CONFIG.room.width;
-    const baseX = w/2 - 1.5, baseZ = -4;
+    const d = CONFIG.room.depth;
+    const baseX = 4, baseZ = -d/2 + 1.2;  // Against front wall
     
     const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
     const darkWoodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodDark, roughness: 0.7 });
@@ -1149,16 +1150,17 @@ function createCauldronSteam(x, y, z) {
 }
 
 function createBells() {
-    // Position above fireplace (left wall at x=-11, z=0 area)
+    // Position under fireplace mantle (left wall, inside fireplace area)
     const w = CONFIG.room.width;
-    const x = -w/2 + 2, y = 5.5, z = 0;  // Above fireplace mantle
+    const x = -w/2 + 1.8, y = 3.8, z = 0;  // Under mantle, rotated to face into room
     
     const bellSizes = [0.08, 0.1, 0.12, 0.1, 0.08];
     const bellMat = new THREE.MeshStandardMaterial({ color: 0xd4a855, metalness: 0.7, roughness: 0.25 });
     
     bellSizes.forEach((size, i) => {
         const bell = new THREE.Mesh(new THREE.ConeGeometry(size, size * 1.8, 16), bellMat);
-        bell.position.set(x - 0.4 + i * 0.2, y, z);
+        // Bells hang in a row along z axis (parallel to wall)
+        bell.position.set(x, y, z - 0.4 + i * 0.2);
         bell.rotation.x = Math.PI;
         bell.castShadow = true;
         scene.add(bell);
@@ -1167,12 +1169,12 @@ function createBells() {
             new THREE.CylinderGeometry(0.005, 0.005, 0.15, 8),
             new THREE.MeshBasicMaterial({ color: 0x5a4a3a })
         );
-        string.position.set(x - 0.4 + i * 0.2, y + size * 1.8 / 2 + 0.075, z);
+        string.position.set(x, y + size * 1.8 / 2 + 0.075, z - 0.4 + i * 0.2);
         scene.add(string);
     });
     
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(1.5, 0.8, 0.5),
+        new THREE.BoxGeometry(0.5, 0.8, 1.5),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(x, y, z);
@@ -1182,33 +1184,26 @@ function createBells() {
 }
 
 function createStairs() {
-    const x = 7.5, y = 0, z = 3;
-    const stepMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.6 });
-    
-    for (let i = 0; i < 8; i++) {
-        const step = new THREE.Mesh(new THREE.BoxGeometry(2, 0.15, 0.35), stepMat);
-        step.position.set(x, 0.15 + i * 0.35, z - i * 0.4);
-        step.castShadow = true;
-        step.receiveShadow = true;
-        scene.add(step);
-        addCollider(x, 0.15 + i * 0.35, z - i * 0.4, 2, 0.35, 0.4);
-    }
-    
-    const railMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium });
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 3.5), railMat);
-    rail.position.set(x + 1.1, 1.8, z - 1.4);
-    rail.rotation.x = Math.atan(0.35 / 0.4);
-    scene.add(rail);
-    addCollider(x + 1.1, 1.8, z - 1.4, 0.15, 1.5, 3.5);
-    
+    // Stairs puzzle trigger is now attached to the main balcony stairs
+    // Create invisible interaction zone near the balcony stairs instead
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(2.5, 3, 4),
+        new THREE.BoxGeometry(2, 3, 2),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    interactZone.position.set(x, 1.5, z - 1);
+    interactZone.position.set(-4, 2, 4);  // Near left balcony stairs
     interactZone.userData = { type: 'stairs', ...CONFIG.interactives.stairs };
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
+    
+    // Second trigger at right stairs
+    const interactZone2 = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 3, 2),
+        new THREE.MeshBasicMaterial({ visible: false })
+    );
+    interactZone2.position.set(4, 2, 4);  // Near right balcony stairs
+    interactZone2.userData = { type: 'stairs', ...CONFIG.interactives.stairs };
+    interactiveObjects.push(interactZone2);
+    scene.add(interactZone2);
 }
 
 function createMezzanine() {
