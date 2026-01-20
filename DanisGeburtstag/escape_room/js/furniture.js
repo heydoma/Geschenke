@@ -107,15 +107,7 @@ function createFireplace() {
     createFireParticles(wallX + 0.7, centerZ);
     createEmberParticles(wallX + 0.7, centerZ);
     
-    // Interactive zone
-    const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 3, 3),
-        new THREE.MeshBasicMaterial({ visible: false })
-    );
-    interactZone.position.set(wallX + 1.5, 1.5, centerZ);
-    interactZone.userData = { type: 'fireplace', ...CONFIG.interactives.fireplace };
-    interactiveObjects.push(interactZone);
-    scene.add(interactZone);
+    // Fireplace interactive zone removed - bells are under the mantle now
 }
 
 // ============================================================================
@@ -486,12 +478,126 @@ function createDesk() {
     
     addCollider(x, 0.5, z, 3.8, 1, 2);
     
-    // Interactive zone
+    // Main desk is now just for the magic map - no puzzle trigger
+    // Puzzle 3 (cipher/runes) moves to the new rune desk
+    
+    // Create the rune desk under the left window
+    createRuneDesk();
+}
+
+// ============================================================================
+// RUNE DESK (Under left window - puzzle 3: cipher/runes)
+// ============================================================================
+function createRuneDesk() {
+    const w = CONFIG.room.width;
+    const d = CONFIG.room.depth;
+    // Position where the old stairs were (right side of room)
+    const x = 7.5;
+    const z = 3;
+    
+    const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
+    const darkWoodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodDark, roughness: 0.7 });
+    
+    // Small writing desk
+    const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.9), woodMat);
+    tableTop.position.set(x, 0.78, z);
+    tableTop.castShadow = true;
+    tableTop.receiveShadow = true;
+    scene.add(tableTop);
+    
+    // Desk legs
+    [[-0.8, -0.35], [-0.8, 0.35], [0.8, -0.35], [0.8, 0.35]].forEach(([dx, dz]) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.78, 0.06), darkWoodMat);
+        leg.position.set(x + dx, 0.39, z + dz);
+        scene.add(leg);
+    });
+    
+    addCollider(x, 0.4, z, 2, 0.85, 1.1);
+    
+    // Large parchment with runes
+    const parchment = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.6, 0.8),
+        new THREE.MeshStandardMaterial({ 
+            color: 0xf5e6c8, 
+            roughness: 0.9,
+            side: THREE.DoubleSide
+        })
+    );
+    parchment.rotation.x = -Math.PI / 2;
+    parchment.rotation.z = 0.05;
+    parchment.position.set(x, 0.83, z);
+    scene.add(parchment);
+    
+    // Ink bottle (dark glass)
+    const inkBottle = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03, 0.04, 0.08, 12),
+        new THREE.MeshStandardMaterial({ color: 0x0a0a15, roughness: 0.2, metalness: 0.3 })
+    );
+    inkBottle.position.set(x + 0.5, 0.86, z - 0.25);
+    scene.add(inkBottle);
+    
+    // Ink in bottle
+    const ink = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.035, 0.04, 12),
+        new THREE.MeshBasicMaterial({ color: 0x000022 })
+    );
+    ink.position.set(x + 0.5, 0.84, z - 0.25);
+    scene.add(ink);
+    
+    // Quill pen
+    const quillMat = new THREE.MeshStandardMaterial({ color: 0xf0e8d8, roughness: 0.6 });
+    const quillFeather = new THREE.Mesh(
+        new THREE.ConeGeometry(0.02, 0.3, 8),
+        quillMat
+    );
+    quillFeather.rotation.z = Math.PI / 4;
+    quillFeather.rotation.x = 0.2;
+    quillFeather.position.set(x + 0.6, 0.88, z - 0.1);
+    scene.add(quillFeather);
+    
+    // Second parchment (rolled)
+    const rolledParchment = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.025, 0.35, 12),
+        new THREE.MeshStandardMaterial({ color: 0xf0dcc0, roughness: 0.8 })
+    );
+    rolledParchment.rotation.z = Math.PI / 2;
+    rolledParchment.position.set(x - 0.6, 0.85, z + 0.2);
+    scene.add(rolledParchment);
+    
+    // Small candle for reading
+    const candleHolder = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.04, 0.05, 0.03, 12),
+        new THREE.MeshStandardMaterial({ color: 0x8b7355, metalness: 0.5 })
+    );
+    candleHolder.position.set(x - 0.5, 0.83, z - 0.3);
+    scene.add(candleHolder);
+    
+    const candle = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.015, 0.02, 0.12, 8),
+        new THREE.MeshStandardMaterial({ color: 0xf5f0e6 })
+    );
+    candle.position.set(x - 0.5, 0.92, z - 0.3);
+    scene.add(candle);
+    
+    // Candle flame
+    const flame = new THREE.Mesh(
+        new THREE.ConeGeometry(0.01, 0.03, 8),
+        new THREE.MeshBasicMaterial({ color: 0xffaa33 })
+    );
+    flame.position.set(x - 0.5, 1.0, z - 0.3);
+    scene.add(flame);
+    
+    // Small light from candle
+    const candleLight = new THREE.PointLight(0xff9944, 0.3, 2);
+    candleLight.position.set(x - 0.5, 1.0, z - 0.3);
+    scene.add(candleLight);
+    
+    // Interactive zone for rune puzzle
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(4, 2, 2.5),
+        new THREE.BoxGeometry(2, 1.5, 1.5),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    interactZone.position.set(x, 1, z + 0.5);
+    interactZone.position.set(x, 0.9, z);
     interactZone.userData = { type: 'desk', ...CONFIG.interactives.desk };
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
@@ -1210,32 +1316,7 @@ function createMezzanine() {
     const mezzMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.6 });
     const railMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium });
     
-    // === RIGHT SIDE MEZZANINE (existing) ===
-    const platform = new THREE.Mesh(new THREE.BoxGeometry(5, 0.15, 4), mezzMat);
-    platform.position.set(6.5, 3, 1);
-    platform.castShadow = true;
-    platform.receiveShadow = true;
-    scene.add(platform);
-    addCollider(6.5, 3, 1, 5, 0.2, 4);
-    
-    const frontRail = new THREE.Mesh(new THREE.BoxGeometry(5, 0.08, 0.08), railMat);
-    frontRail.position.set(6.5, 3.9, 3);
-    scene.add(frontRail);
-    
-    for (let i = 0; i < 8; i++) {
-        const baluster = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.8, 0.06), railMat);
-        baluster.position.set(4.3 + i * 0.65, 3.5, 3);
-        scene.add(baluster);
-    }
-    addCollider(6.5, 3.5, 3.1, 5, 1, 0.2);
-    
-    [4.5, 8.5].forEach(px => {
-        const beam = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 0.2), mezzMat);
-        beam.position.set(px, 1.5, -0.5);
-        beam.castShadow = true;
-        scene.add(beam);
-        addCollider(px, 1.5, -0.5, 0.3, 3, 0.3);
-    });
+    // Right side mezzanine removed - only entrance balcony remains
     
     // === ENTRANCE BALCONY (back wall - player spawn point) ===
     createEntranceBalcony(mezzMat, railMat);
@@ -1428,22 +1509,6 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
 // PROPS
 // ============================================================================
 function createProps() {
-    // Globe on mezzanine
-    const globeStand = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.15, 0.2, 0.8, 16),
-        new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium })
-    );
-    globeStand.position.set(5.5, 3.55, 1);
-    scene.add(globeStand);
-    
-    const globe = new THREE.Mesh(
-        new THREE.SphereGeometry(0.35, 32, 32),
-        new THREE.MeshStandardMaterial({ color: 0x2a5a4a, roughness: 0.4 })
-    );
-    globe.position.set(5.5, 4.3, 1);
-    globe.castShadow = true;
-    scene.add(globe);
-    
     // Ladder
     const ladderMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight });
     const ladderGroup = new THREE.Group();
