@@ -22,7 +22,11 @@ let baseEyeHeight = CONFIG.player.height;
 
 // Colliders
 const colliders = [];
-const playerPosition = new THREE.Vector3(0, CONFIG.player.height, 5);
+const playerPosition = new THREE.Vector3(
+    CONFIG.player.startX, 
+    CONFIG.player.startY, 
+    CONFIG.player.startZ
+);
 
 // Objects
 let fireParticles, dustParticles, emberParticles, orbDustParticles;
@@ -63,8 +67,8 @@ function init() {
     // Camera
     camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.copy(playerPosition);
-    camera.rotation.y = Math.PI; // Face into room
-    euler.y = Math.PI;
+    camera.rotation.y = CONFIG.player.startRotY;
+    euler.y = CONFIG.player.startRotY;
     
     // Renderer
     const canvas = document.getElementById('game-canvas');
@@ -225,6 +229,11 @@ window.addEventListener('load', () => {
             
             const gem = document.querySelector(`.progress-gem[data-game="${num}"]`);
             if (gem) gem.classList.add('active');
+            
+            // === REVEAL MAP PATH for this puzzle ===
+            if (typeof revealMapPath === 'function') {
+                revealMapPath(num);
+            }
             
             let solved = 0;
             for (let i = 1; i <= 7; i++) {

@@ -4,19 +4,19 @@
 // ============================================================================
 
 const CONFIG = {
-    // Room dimensions
+    // Room dimensions (larger for grand library feel)
     room: {
-        width: 18,
-        height: 9,
-        depth: 14
+        width: 22,
+        height: 12,
+        depth: 18
     },
     
-    // Movement (realistic walking speed: 1.4 m/s, jogging: 2.5 m/s)
+    // Movement (slow, calm exploration pace)
     movement: {
-        walkSpeed: 3.0,           // Normal walking (m/s)
-        sprintSpeed: 4.5,         // Sprinting (m/s)
-        acceleration: 12,         // How fast to reach max speed
-        deceleration: 10,         // How fast to stop
+        walkSpeed: 1.8,           // Normal walking (m/s) - slow exploration
+        sprintSpeed: 3.2,         // Sprinting (m/s)
+        acceleration: 8,          // Smooth acceleration
+        deceleration: 6,          // Smooth deceleration
         mouseSensitivity: 0.001,  // Mouse look speed
     },
     
@@ -31,26 +31,31 @@ const CONFIG = {
     // Head bob
     headBob: {
         enabled: true,
-        walkAmplitude: 0.03,      // Vertical bob amount
-        walkFrequency: 8,         // Bob speed when walking
-        sprintAmplitude: 0.05,
-        sprintFrequency: 12,
-        swayAmount: 0.002         // Horizontal camera sway
+        walkAmplitude: 0.02,      // Subtle vertical bob
+        walkFrequency: 6,         // Slower bob for calm pace
+        sprintAmplitude: 0.04,
+        sprintFrequency: 10,
+        swayAmount: 0.001         // Subtle horizontal sway
     },
     
     // Player collision (capsule approximated as cylinder)
     player: {
         radius: 0.35,             // Collision radius
         height: 1.7,              // Eye height
-        stepHeight: 0.3           // Can step over small obstacles
+        stepHeight: 0.35,         // Can step over obstacles (increased for stairs)
+        // Spawn on balcony looking into room
+        startX: 0,
+        startY: 4.2,              // Elevated balcony (floor + eye height)
+        startZ: 6.5,              // On the balcony (d/2 - 2.5)
+        startRotY: 0              // Facing into room (toward fireplace)
     },
     
-    // Particles
+    // Particles (reduced for performance)
     particles: {
-        dustCount: 600,           // Floating dust motes
-        fireCount: 250,           // Fire particles
-        emberCount: 50,           // Floating embers
-        orbDustCount: 100         // Magical dust near orb
+        dustCount: 200,           // Floating dust motes
+        fireCount: 100,           // Fire particles
+        emberCount: 20,           // Floating embers
+        orbDustCount: 40          // Magical dust near orb
     },
     
     // Lighting (brighter moon for visibility)
@@ -70,9 +75,9 @@ const CONFIG = {
         floorFogOpacity: 0.25
     },
     
-    // Books
+    // Books (reduced for performance)
     books: {
-        totalCount: 2000,         // Total instanced books
+        totalCount: 800,          // Total instanced books
         colorsSpine: [
             0x8b4513, 0x654321, 0x4a2511, // Browns
             0x2e4a1c, 0x1e3a0c, 0x3e5a2c, // Greens

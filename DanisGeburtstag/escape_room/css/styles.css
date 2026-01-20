@@ -254,6 +254,7 @@ body {
     width: 100px;
     height: 4px;
     -webkit-appearance: none;
+    appearance: none;
     background: #3a3530;
     border-radius: 2px;
     outline: none;
@@ -261,6 +262,7 @@ body {
 
 .setting-row input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 12px;
     height: 12px;
     background: #d4a855;

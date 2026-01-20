@@ -6,8 +6,38 @@
 // ============================================================================
 // COLLISION DETECTION
 // ============================================================================
+
+// Get floor height at a given XZ position by finding the highest walkable surface
+function getFloorHeight(x, z) {
+    let floorY = 0;  // Default ground floor
+    const playerFeet = playerPosition.y - CONFIG.player.height;
+    const stepUp = CONFIG.player.stepHeight;  // How high we can step up
+    
+    for (const box of colliders) {
+        // Check if we're within the XZ bounds of this collider
+        if (x > box.min.x && x < box.max.x && z > box.min.z && z < box.max.z) {
+            const surfaceY = box.max.y;
+            const boxHeight = box.max.y - box.min.y;
+            
+            // Only consider thin surfaces as walkable floors (not walls)
+            if (boxHeight > 0.5) continue;
+            
+            // Accept any surface that is:
+            // - At or below current feet + step height (can step up to)
+            // - Higher than previously found floor (find the highest valid one)
+            // This allows stepping DOWN onto lower surfaces AND stepping UP
+            if (surfaceY <= playerFeet + stepUp + 0.5 && surfaceY > floorY) {
+                floorY = surfaceY;
+            }
+        }
+    }
+    
+    return floorY;
+}
+
 function checkCollision(newPos) {
     const radius = CONFIG.player.radius;
+    const feetY = newPos.y - CONFIG.player.height;
     
     for (const box of colliders) {
         const minX = box.min.x - radius;
@@ -15,10 +45,19 @@ function checkCollision(newPos) {
         const minZ = box.min.z - radius;
         const maxZ = box.max.z + radius;
         
-        if (newPos.x > minX && newPos.x < maxX &&
-            newPos.z > minZ && newPos.z < maxZ &&
-            newPos.y > box.min.y && newPos.y < box.max.y + CONFIG.player.height) {
-            return true;
+        // Check XZ overlap
+        if (newPos.x > minX && newPos.x < maxX && newPos.z > minZ && newPos.z < maxZ) {
+            const boxHeight = box.max.y - box.min.y;
+            
+            // If this is a thin surface (floor/stair) that we can stand ON, don't block
+            if (boxHeight < 0.5 && Math.abs(box.max.y - feetY) < CONFIG.player.stepHeight) {
+                continue;  // This is a walkable surface, not a wall
+            }
+            
+            // Check vertical overlap (player body vs collider)
+            if (feetY < box.max.y && newPos.y > box.min.y) {
+                return true;  // Blocked
+            }
         }
     }
     
@@ -279,9 +318,25 @@ function updateMovement(delta, time) {
     newPos.x += velocity.x * delta;
     newPos.z += velocity.z * delta;
     
-    // Collision resolution
+    // Collision resolution (horizontal)
     const resolvedPos = resolveCollision(playerPosition, newPos);
-    playerPosition.copy(resolvedPos);
+    playerPosition.x = resolvedPos.x;
+    playerPosition.z = resolvedPos.z;
+    
+    // Floor height detection (for stairs/ramps)
+    const floorY = getFloorHeight(playerPosition.x, playerPosition.z);
+    const targetY = floorY + CONFIG.player.height;
+    
+    // Smooth Y transition for stairs
+    const yDiff = targetY - playerPosition.y;
+    if (Math.abs(yDiff) > 0.01) {
+        // Going up stairs is faster, going down is gravity-like
+        const ySpeed = yDiff > 0 ? 8.0 : 12.0;
+        playerPosition.y += yDiff * ySpeed * delta;
+        // Clamp to prevent overshoot
+        if (yDiff > 0 && playerPosition.y > targetY) playerPosition.y = targetY;
+        if (yDiff < 0 && playerPosition.y < targetY) playerPosition.y = targetY;
+    }
     
     // Head bob
     if (CONFIG.headBob.enabled && isMoving && velocity.length() > 0.5) {

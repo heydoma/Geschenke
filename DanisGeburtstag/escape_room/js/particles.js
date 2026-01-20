@@ -274,17 +274,46 @@ function updateLighting(time) {
 
 function updateFloatingCandles(time) {
     floatingCandles.forEach((candle, i) => {
-        if (candle.mesh) {
-            const y = candle.baseY + Math.sin(time * 0.5 + (candle.phase || i)) * 0.15;
-            candle.mesh.position.y = y;
+        const phase = candle.phase || i;
+        
+        // Flame flicker effect (all candles)
+        if (candle.flame) {
+            // Slight scale variation for flicker
+            const flickerScale = 0.9 + Math.sin(time * 15 + phase * 2) * 0.15 + Math.sin(time * 23 + phase) * 0.1;
+            candle.flame.scale.setScalar(flickerScale);
+        }
+        
+        // Magical floating candles get gentle bobbing motion
+        if (candle.isMagical && candle.mesh) {
+            const bobY = Math.sin(time * 0.8 + phase) * 0.08;
+            const bobX = Math.sin(time * 0.5 + phase * 1.3) * 0.02;
+            const bobZ = Math.cos(time * 0.6 + phase * 0.9) * 0.02;
+            
+            candle.mesh.position.y = candle.baseY + bobY;
+            candle.mesh.position.x += bobX * 0.01;
+            candle.mesh.position.z += bobZ * 0.01;
             
             if (candle.flame) {
-                candle.flame.position.y = y + 0.095;
+                candle.flame.position.y = candle.baseY + bobY + 0.08;
             }
-            if (candle.light) {
-                candle.light.position.y = y + 0.1;
-                candle.light.intensity = 0.25 + Math.sin(time * 8 + i) * 0.08;
+            
+            // Magic ring rotation
+            if (candle.magicRing) {
+                candle.magicRing.position.y = candle.baseY + bobY - 0.02;
+                candle.magicRing.rotation.z += 0.01;
+                candle.magicRing.material.opacity = 0.3 + Math.sin(time * 2 + phase) * 0.15;
             }
+            
+            // Sparkles orbit
+            if (candle.sparkles) {
+                candle.sparkles.position.y = candle.baseY + bobY;
+                candle.sparkles.rotation.y += 0.02;
+            }
+        }
+        
+        // Point light intensity flicker (if present)
+        if (candle.light) {
+            candle.light.intensity = 0.3 + Math.sin(time * 10 + phase) * 0.1 + Math.sin(time * 17 + phase * 1.5) * 0.05;
         }
     });
 }
