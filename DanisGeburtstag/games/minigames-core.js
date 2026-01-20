@@ -15,20 +15,26 @@ const gameState = {
 };
 
 // Modal System
-function openMinigame(slotId) {
-    const slotIndex = parseInt(slotId.replace(/slot[LR]/, '')) - 1;
-    const minigameNum = slotId.startsWith('slotL') ? slotIndex : slotIndex + 4;
+function openMinigame(minigameNum) {
+    // Support both new (number) and old (slotId) format
+    if (typeof minigameNum === 'string') {
+        const slotId = minigameNum;
+        const slotIndex = parseInt(slotId.replace(/slot[LR]/, '')) - 1;
+        minigameNum = slotId.startsWith('slotL') ? slotIndex + 1 : slotIndex + 5;
+    }
     
-    if (gameState.solved[minigameNum]) {
+    if (gameState.solved[minigameNum - 1]) {
         showMessage('Dieses Rätsel wurde bereits gelöst! ✨');
         return;
     }
     
-    const modal = document.getElementById(`minigame${minigameNum + 1}`);
+    const modal = document.getElementById(`minigame${minigameNum}`);
     if (modal) {
         modal.classList.add('active');
-        document.getElementById('mainLibrary').classList.add('dimmed');
-        initMinigame(minigameNum + 1);
+        // Support both old and new HTML structure
+        const mainLibrary = document.getElementById('mainLibrary');
+        if (mainLibrary) mainLibrary.classList.add('dimmed');
+        initMinigame(minigameNum);
     }
 }
 
@@ -36,7 +42,8 @@ function closeMinigame(minigameNum) {
     const modal = document.getElementById(`minigame${minigameNum}`);
     if (modal) {
         modal.classList.remove('active');
-        document.getElementById('mainLibrary').classList.remove('dimmed');
+        const mainLibrary = document.getElementById('mainLibrary');
+        if (mainLibrary) mainLibrary.classList.remove('dimmed');
     }
 }
 
@@ -54,7 +61,7 @@ function resetMinigame(minigameNum) {
 function showHint(minigameNum) {
     const hints = [
         'Logik ist der Schlüssel. Schließe aus, was nicht sein kann.',
-        'Beobachte die Übereinstimmungen. Farbe, Dauer, Symbol – was verbindet sie?',
+        'Gold, lang leuchtend, mit Stern-Symbol – finde alle vier in der richtigen Reihenfolge.',
         'Der Kontext verrät die Bedeutung. Welches Wort passt?',
         'Plane voraus. Jede Bewegung hat Konsequenzen.',
         'Geduld und sanfte Bewegungen. Zu viel Hitze zerstört.',

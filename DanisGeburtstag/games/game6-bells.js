@@ -398,7 +398,7 @@ const bellGame = (() => {
         }, 500);
     }
     
-    return { init, reset };
+    return { init, reset, playSequence };
 })();
 
 // Globale Funktionen für HTML
@@ -408,4 +408,8 @@ function initBellGame() {
 
 function resetBellGame() {
     bellGame.reset();
+}
+
+function startBellSequence() {
+    bellGame.playSequence();
 }
