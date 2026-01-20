@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Die Verbotene Abteilung</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="../minigames.css">
+</head>
+<body>
+
+<!-- 3D Canvas -->
+<canvas id="game-canvas"></canvas>
+
+<!-- HUD -->
+<div class="crosshair" id="crosshair"></div>
+
+<div id="interactionPrompt" class="interaction-prompt"></div>
+
+<div class="stamina-bar" id="staminaBar">
+    <div class="stamina-fill" id="staminaFill" style="width: 100%;"></div>
+</div>
+
+<div class="game-hud">
+    <div class="progress-tracker">
+        <div class="progress-gem" data-game="1" title="Vielsaft-Trank"></div>
+        <div class="progress-gem" data-game="2" title="Flüsternde Bücher"></div>
+        <div class="progress-gem" data-game="3" title="Die Chiffre"></div>
+        <div class="progress-gem" data-game="4" title="Bewegende Treppen"></div>
+        <div class="progress-gem" data-game="5" title="Geheime Tinte"></div>
+        <div class="progress-gem" data-game="6" title="Die Glocken"></div>
+        <div class="progress-gem" data-game="7" title="Die Chronik"></div>
+    </div>
+</div>
+
+<!-- Settings -->
+<button class="settings-btn" onclick="toggleSettings()">⚙</button>
+<div class="settings-panel" id="settingsPanel">
+    <h3>Einstellungen</h3>
+    <div class="setting-row">
+        <label>Gehgeschwindigkeit</label>
+        <input type="range" id="walkSpeedSlider" min="1.5" max="5" step="0.5" value="3">
+    </div>
+    <div class="setting-row">
+        <label>Mausempfindlichkeit</label>
+        <input type="range" id="sensitivitySlider" min="0.3" max="2" step="0.1" value="1">
+    </div>
+    <div class="setting-row">
+        <label>Helligkeit</label>
+        <input type="range" id="bloomSlider" min="0.5" max="1.5" step="0.1" value="1">
+    </div>
+    <div class="setting-row">
+        <label>Nebelweite</label>
+        <input type="range" id="fogSlider" min="10" max="30" step="2" value="22">
+    </div>
+</div>
+
+<!-- Book Popup -->
+<div class="book-popup" id="bookPopup">
+    <h3 id="bookTitle"></h3>
+    <p id="bookContent"></p>
+</div>
+
+<!-- Controls Hint -->
+<div class="controls-hint">
+    <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Bewegen</p>
+    <p><kbd>Shift</kbd> Rennen</p>
+    <p><kbd>E</kbd> Interagieren</p>
+    <p><kbd>ESC</kbd> Menü schließen</p>
+</div>
+
+<!-- Intro Overlay -->
+<div class="intro-overlay" id="introOverlay">
+    <h1 class="intro-title">Die Verbotene Abteilung</h1>
+    <p class="intro-subtitle">Ein magisches Escape Room Abenteuer</p>
+    <button class="start-btn" onclick="startGame()">Betreten</button>
+</div>
+
+<!-- ============================================================================
+     MINIGAME MODALS
+     ============================================================================ -->
+
+<!-- Minigame 1: Polyjuice Potion -->
+<div class="minigame-modal" id="minigame1">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🧪 Der Vielsaft-Trank</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(1)">💡</button>
+                <button class="btn btn-reset" onclick="polyjuiceGame.reset()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(1)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="text-align: center; color: #d4c4a8; font-style: italic; margin-bottom: 20px;">
+                „Jede Zutat in den richtigen Kessel..."
+            </p>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid #8b7355; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <p style="color: #a89888; font-size: 13px; text-align: center; margin-bottom: 10px;">📜 Rezept:</p>
+                <ul style="color: #d4c4a8; font-size: 14px; list-style: none; padding: 0; text-align: center;">
+                    <li>• Kupfer: Fluxkraut + Blutegel</li>
+                    <li>• Eisen: Knöterich + Florfliegen</li>
+                    <li>• Zinn: Fluxkraut + Florfliegen</li>
+                    <li>• Stein: Knöterich + Blutegel</li>
+                </ul>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 30px;">
+                <div style="text-align: center;"><div class="cauldron" data-cauldron="copper" style="width: 100px; height: 120px; background: linear-gradient(135deg, #b87333, #8b5a2b); border-radius: 10px 10px 50px 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid #cd7f32; box-shadow: inset 0 -20px 30px rgba(0,0,0,0.3);"></div><p style="margin-top: 8px; color: #cd7f32;">Kupfer</p></div>
+                <div style="text-align: center;"><div class="cauldron" data-cauldron="iron" style="width: 100px; height: 120px; background: linear-gradient(135deg, #5a5a5a, #3a3a3a); border-radius: 10px 10px 50px 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid #6a6a6a; box-shadow: inset 0 -20px 30px rgba(0,0,0,0.3);"></div><p style="margin-top: 8px; color: #8a8a8a;">Eisen</p></div>
+                <div style="text-align: center;"><div class="cauldron" data-cauldron="tin" style="width: 100px; height: 120px; background: linear-gradient(135deg, #8a8a8a, #6a6a6a); border-radius: 10px 10px 50px 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid #9a9a9a; box-shadow: inset 0 -20px 30px rgba(0,0,0,0.3);"></div><p style="margin-top: 8px; color: #aaaaaa;">Zinn</p></div>
+                <div style="text-align: center;"><div class="cauldron" data-cauldron="stone" style="width: 100px; height: 120px; background: linear-gradient(135deg, #6a5a4a, #4a3a2a); border-radius: 10px 10px 50px 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid #7a6a5a; box-shadow: inset 0 -20px 30px rgba(0,0,0,0.3);"></div><p style="margin-top: 8px; color: #9a8a7a;">Stein</p></div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <div class="ingredient" draggable="true" data-ingredient="fluxweed" style="padding: 15px 20px; background: linear-gradient(135deg, #2d5a27, #1a3a17); border: 2px solid #4a8a44; border-radius: 10px; cursor: grab; display: flex; flex-direction: column; align-items: center; gap: 5px;"><span style="font-size: 30px;">🌿</span><span style="color: #8fbc8f; font-size: 12px;">Fluxkraut</span></div>
+                <div class="ingredient" draggable="true" data-ingredient="knotgrass" style="padding: 15px 20px; background: linear-gradient(135deg, #3a5a2a, #2a4a1a); border: 2px solid #5a8a4a; border-radius: 10px; cursor: grab; display: flex; flex-direction: column; align-items: center; gap: 5px;"><span style="font-size: 30px;">🌾</span><span style="color: #9acd32; font-size: 12px;">Knöterich</span></div>
+                <div class="ingredient" draggable="true" data-ingredient="lacewing" style="padding: 15px 20px; background: linear-gradient(135deg, #4a3a5a, #3a2a4a); border: 2px solid #6a5a7a; border-radius: 10px; cursor: grab; display: flex; flex-direction: column; align-items: center; gap: 5px;"><span style="font-size: 30px;">🦋</span><span style="color: #dda0dd; font-size: 12px;">Florfliegen</span></div>
+                <div class="ingredient" draggable="true" data-ingredient="leech" style="padding: 15px 20px; background: linear-gradient(135deg, #4a2a2a, #3a1a1a); border: 2px solid #6a3a3a; border-radius: 10px; cursor: grab; display: flex; flex-direction: column; align-items: center; gap: 5px;"><span style="font-size: 30px;">🩸</span><span style="color: #cd5c5c; font-size: 12px;">Blutegel</span></div>
+            </div>
+            <button onclick="polyjuiceGame.check()" style="display: block; margin: 25px auto 0; padding: 12px 30px; font-size: 16px; background: linear-gradient(135deg, #8b4513, #654321); color: #f5e6d3; border: 2px solid #a0522d; border-radius: 10px; cursor: pointer;">🔥 Brauen</button>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 2: Whispering Books -->
+<div class="minigame-modal" id="minigame2">
+    <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+            <h2 class="modal-title">📖 Die Flüsternden Buchrücken</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(2)">💡</button>
+                <button class="btn btn-reset" onclick="whisperingBooks.reset()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(2)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="whisperingBooksContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 3: Cipher -->
+<div class="minigame-modal" id="minigame3">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🔐 Die Chiffre</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(3)">💡</button>
+                <button class="btn btn-reset" onclick="initCipher()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(3)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="cipherContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 4: Staircase -->
+<div class="minigame-modal" id="minigame4">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🪜 Die Treppen</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(4)">💡</button>
+                <button class="btn btn-reset" onclick="initStaircase()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(4)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="staircaseContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 5: Invisible Ink -->
+<div class="minigame-modal" id="minigame5">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🕯️ Geheime Tinte</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(5)">💡</button>
+                <button class="btn btn-reset" onclick="initInvisibleInk()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(5)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="text-align: center; color: #d4c4a8; font-style: italic; margin-bottom: 15px;">„Wärme offenbart die Wahrheit..."</p>
+            <canvas id="parchmentCanvas" width="400" height="400"></canvas>
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                <input type="text" id="inkGuessInput" placeholder="Was siehst du?" style="padding: 10px 15px; font-size: 16px; border: 2px solid #8b7355; border-radius: 8px; background: #f5e6d3; color: #4a3520; width: 200px;" onkeypress="if(event.key === 'Enter') checkInvisibleInkGuess(this.value);">
+                <button onclick="checkInvisibleInkGuess(document.getElementById('inkGuessInput').value)" style="padding: 10px 20px; font-size: 16px; background: linear-gradient(135deg, #8b4513, #654321); color: #f5e6d3; border: none; border-radius: 8px; cursor: pointer;">✨</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 6: Bells -->
+<div class="minigame-modal" id="minigame6">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🔔 Die Glocken</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(6)">💡</button>
+                <button class="btn btn-reset" onclick="resetBellGame()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(6)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="text-align: center; color: #d4c4a8; font-style: italic; margin-bottom: 15px;">„Zeit fließt auch rückwärts..."</p>
+            <div id="bellPhase" style="text-align: center; font-size: 14px; margin-bottom: 10px; color: #d4c4a8;"></div>
+            <div id="bellContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 7: Book Sort -->
+<div class="minigame-modal" id="minigame7">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">📚 Die Chronik</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(7)">💡</button>
+                <button class="btn btn-reset" onclick="initBookSort()">🔄</button>
+                <button class="btn btn-close" onclick="closeMinigame(7)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="text-align: center; color: #d4c4a8; font-style: italic; margin-bottom: 15px;">„Die Geschichte muss in der richtigen Reihenfolge erzählt werden..."</p>
+            <div id="bookShelf"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Minigame 8: Pensieve -->
+<div class="minigame-modal" id="minigame8">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 class="modal-title">🌀 Das Denkarium</h2>
+            <div class="modal-controls">
+                <button class="btn btn-hint" onclick="showHint(8)">💡</button>
+                <button class="btn btn-close" onclick="closeMinigame(8)">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div style="text-align: center;">
+                <svg width="200" height="100" viewBox="0 0 200 100">
+                    <ellipse cx="100" cy="50" rx="90" ry="40" fill="rgba(100, 130, 180, 0.2)" stroke="#8b7355" stroke-width="3"/>
+                </svg>
+            </div>
+            <div id="penseiveSlots"></div>
+            <div id="availableArtifacts"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================================
+     SCRIPTS
+     ============================================================================ -->
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- MINIGAME SCRIPTS (relative to parent folder) -->
+<script src="../games/minigames-core.js"></script>
+<script src="../games/game1-polyjuice.js"></script>
+<script src="../games/game2-muffliato.js"></script>
+<script src="../games/game3-cipher.js"></script>
+<script src="../games/game4-staircase.js"></script>
+<script src="../games/game5-invisibleink.js"></script>
+<script src="../games/game6-bells.js"></script>
+<script src="../games/game7-booksort.js"></script>
+<script src="../games/game8-pensieve.js"></script>
+
+<!-- ESCAPE ROOM SCRIPTS -->
+<script src="js/config.js"></script>
+<script src="js/room.js"></script>
+<script src="js/furniture.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/controls.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

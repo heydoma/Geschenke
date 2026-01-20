@@ -1,0 +1,348 @@
+/* ============================================================================
+   ESCAPE ROOM - STYLES
+   Die Verbotene Abteilung - Harry Potter Themed Escape Room
+   ============================================================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    overflow: hidden;
+    background: #000;
+    font-family: 'Georgia', serif;
+}
+
+#game-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* === CROSSHAIR === */
+.crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 4px;
+    background: rgba(212, 196, 168, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+    box-shadow: 0 0 8px rgba(212, 196, 168, 0.4);
+}
+
+/* === INTERACTION PROMPT === */
+.interaction-prompt {
+    position: fixed;
+    bottom: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #d4c4a8;
+    font-size: 14px;
+    border: 1px solid rgba(139, 115, 85, 0.5);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+.interaction-prompt.visible { opacity: 1; }
+
+.interaction-prompt kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    background: rgba(139, 115, 85, 0.3);
+    border: 1px solid #8b7355;
+    border-radius: 3px;
+    margin: 0 4px;
+    font-family: monospace;
+}
+
+/* === STAMINA BAR === */
+.stamina-bar {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.stamina-bar.visible { opacity: 1; }
+
+.stamina-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b7355, #d4a855);
+    transition: width 0.1s ease;
+    border-radius: 2px;
+}
+
+/* === HUD === */
+.game-hud {
+    position: fixed;
+    top: 20px;
+    left: 25px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progress-tracker {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+}
+
+.progress-gem {
+    width: 18px;
+    height: 18px;
+    background: rgba(50, 50, 50, 0.6);
+    border: 2px solid #5a4a3a;
+    border-radius: 50%;
+    transition: all 0.4s ease;
+}
+
+.progress-gem.active {
+    background: radial-gradient(circle at 35% 35%, #ffd700, #b8860b);
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
+
+/* === INTRO OVERLAY === */
+.intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, #1a1510 0%, #0a0806 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.intro-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.intro-title {
+    font-size: 3rem;
+    color: #d4c4a8;
+    text-shadow: 0 0 30px rgba(212, 196, 168, 0.3);
+    margin-bottom: 15px;
+    letter-spacing: 4px;
+}
+
+.intro-subtitle {
+    font-size: 1.2rem;
+    color: #8b7355;
+    margin-bottom: 40px;
+    font-style: italic;
+}
+
+.start-btn {
+    padding: 15px 50px;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #4a3520, #2a1a0a);
+    color: #d4c4a8;
+    border: 2px solid #8b7355;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Georgia', serif;
+    letter-spacing: 2px;
+}
+
+.start-btn:hover {
+    background: linear-gradient(135deg, #5a4530, #3a2a1a);
+    border-color: #d4a855;
+    box-shadow: 0 0 25px rgba(212, 168, 85, 0.3);
+    transform: scale(1.05);
+}
+
+/* === SETTINGS === */
+.settings-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    border-radius: 8px;
+    color: #d4c4a8;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+.settings-btn:hover {
+    background: rgba(139, 115, 85, 0.3);
+    border-color: #d4a855;
+}
+
+.settings-panel {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 250px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(139, 115, 85, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.settings-panel.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.settings-panel h3 {
+    color: #d4c4a8;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(139, 115, 85, 0.3);
+    padding-bottom: 10px;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.setting-row label {
+    color: #a89888;
+    font-size: 12px;
+}
+
+.setting-row input[type="range"] {
+    width: 100px;
+    height: 4px;
+    -webkit-appearance: none;
+    background: #3a3530;
+    border-radius: 2px;
+    outline: none;
+}
+
+.setting-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #d4a855;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* === BOOK POPUP === */
+.book-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #2a1a0a 0%, #1a0f08 100%);
+    border: 3px solid #8b7355;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 500px;
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.book-popup.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.book-popup h3 {
+    color: #d4c4a8;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.book-popup p {
+    color: #a89888;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* === CONTROLS HINT === */
+.controls-hint {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    border-radius: 8px;
+    padding: 12px 15px;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+.controls-hint p {
+    color: #a89888;
+    font-size: 11px;
+    margin: 3px 0;
+}
+
+.controls-hint kbd {
+    display: inline-block;
+    padding: 1px 5px;
+    background: rgba(139, 115, 85, 0.2);
+    border: 1px solid #5a4a3a;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 10px;
+    color: #d4c4a8;
+}
+
+/* === MINIGAME SPECIFIC STYLES === */
+.ingredient.placed { opacity: 0.3; pointer-events: none; }
+.cauldron.drop-target { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6) !important; }
+.cauldron.success { box-shadow: 0 0 30px rgba(100, 200, 100, 0.8) !important; }
+.cauldron.error { animation: shake 0.5s ease-in-out; }
+
+@keyframes shake { 
+    0%, 100% { transform: translateX(0); } 
+    25% { transform: translateX(-10px); } 
+    75% { transform: translateX(10px); } 
+}
