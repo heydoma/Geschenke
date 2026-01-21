@@ -1193,7 +1193,7 @@ function createWallKey() {
     
     // Position: Links neben der Alchemy Station (die ist bei x=4, z=-d/2+1.2)
     // Wir setzen die Vitrine an die Vorderwand, links vom Alchemietisch
-    const x = 1.5;           // Links vom Alchemietisch (der ist bei x=4)
+    const x = -4;           // Noch weiter links vom Alchemietisch (der ist bei x=4)
     const y = 1.5;           // Augenhöhe
     const z = -d/2 + 0.2;    // An der Vorderwand
     

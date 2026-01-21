@@ -5,7 +5,7 @@
 
 const keyCatch = (() => {
     // === KONSTANTEN ===
-    const TOTAL_KEYS = 40;  // Viele ablenkende Schlüssel
+    const TOTAL_KEYS = 35;  // Viele ablenkende Schlüssel
     const CATCH_TIME = 20000;  // 20 Sekunden Zeit
     const KEY_SPEED_MIN = 1;
     const KEY_SPEED_MAX = 5;
@@ -45,10 +45,10 @@ const keyCatch = (() => {
                 vy: (Math.random() - 0.5) * (KEY_SPEED_MAX - KEY_SPEED_MIN) * 2 + KEY_SPEED_MIN * Math.sign(Math.random() - 0.5),
                 rotation: Math.random() * 360,
                 rotationSpeed: (Math.random() - 0.5) * 8,
-                scale: isGolden ? 1.3 : 0.8 + Math.random() * 0.4,
+                scale: isGolden ? 1.1 : 0.8 + Math.random() * 0.4, // dezenter
                 isGolden: isGolden,
                 // Goldener Schlüssel hat besondere Merkmale
-                color: isGolden ? '#FFD700' : '#' + ['8B7355', 'A0522D', 'CD853F', '696969', '808080', 'B8860B'][Math.floor(Math.random() * 6)],
+                color: isGolden ? '#E6C200' : '#' + ['8B7355', 'A0522D', 'CD853F', '696969', '808080', 'B8860B'][Math.floor(Math.random() * 6)], // matteres Gold
                 wingSpeed: 3 + Math.random() * 3
             });
         }
@@ -115,7 +115,7 @@ const keyCatch = (() => {
                 transform: rotate(${key.rotation}deg);
                 cursor: pointer;
                 transition: transform 0.1s ease;
-                filter: ${key.isGolden ? 'drop-shadow(0 0 8px gold)' : 'none'};
+                filter: ${key.isGolden ? 'drop-shadow(0 0 4px gold)' : 'none'};
                 z-index: ${key.isGolden ? 5 : 1};
             `;
             
@@ -125,14 +125,14 @@ const keyCatch = (() => {
                     <span style="color: ${key.color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🗝️</span>
                     <span class="key-wing-left" style="
                         position: absolute;
-                        left: -8px;
+                        left: 9px;
                         top: -2px;
                         font-size: ${12 * key.scale}px;
                         animation: wingFlap${key.isGolden ? 'Fast' : ''} ${key.wingSpeed / 10}s infinite;
                     ">🪽</span>
                     <span class="key-wing-right" style="
                         position: absolute;
-                        right: -8px;
+                        left: 27px;
                         top: -2px;
                         font-size: ${12 * key.scale}px;
                         transform: scaleX(-1);

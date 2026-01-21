@@ -9,8 +9,8 @@ const polyjuiceGame = (() => {
     // Solution (fixed, immutable)
     const SOLUTION = {
         copper: 'knotgrass',  // Fluxkraut NICHT in Kupfer → Knöterich
-        iron: 'fluxweed',     // Blutegel rechts von Eisen → Eisen = Fluxkraut
-        tin: 'leech',         // Blutegel rechts von Eisen → Zinn = Blutegel
+        iron: 'leech',        // Eisen = Blutegel (macht es leichter, da Blutegel und Eisen direkt zugeordnet)
+        tin: 'fluxweed',      // Zinn = Fluxkraut
         stone: 'lacewing'     // Florfliegen = höchste Temp → Stein
     };
 
