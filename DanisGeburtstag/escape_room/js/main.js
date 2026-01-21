@@ -99,7 +99,7 @@ function init() {
     createMezzanine();
     createProps();
     createDustParticles();
-    createFloorFog();
+    // Floor fog removed (didn't look good)
     createFloatingCandles();
     createGodRays();
     

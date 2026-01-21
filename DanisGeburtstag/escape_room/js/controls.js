@@ -206,6 +206,14 @@ function interact() {
         playSound(440, 'sine', 0.8, 0.15);
     }
     
+    if (type === 'magicMap') {
+        document.exitPointerLock();
+        if (typeof openMaraudersMap === 'function') {
+            openMaraudersMap();
+        }
+        return;
+    }
+    
     if (game) {
         document.exitPointerLock();
         isMinigameOpen = true;

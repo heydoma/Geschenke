@@ -238,64 +238,7 @@ function createGiantBackBookshelf() {
     base.position.set(x, 0.1, z);
     scene.add(base);
     
-    // === ROLLING LADDER ===
-    // Position at FRONT of bookshelf (lower z, towards player)
-    createRollingLadder(x - 3, shelfHeight, z - shelfDepth/2 - 0.2);
-    createRollingLadder(x + 5, shelfHeight, z - shelfDepth/2 - 0.2);
-    
     addCollider(x, shelfHeight/2, z, shelfWidth + 0.3, shelfHeight, shelfDepth + 0.4);
-}
-
-function createRollingLadder(x, height, z) {
-    const ladderMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.6 });
-    const metalMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, metalness: 0.6, roughness: 0.4 });
-    
-    const ladderHeight = height - 1;
-    
-    // Side rails
-    [-0.25, 0.25].forEach(dx => {
-        const rail = new THREE.Mesh(
-            new THREE.BoxGeometry(0.06, ladderHeight, 0.06),
-            ladderMat
-        );
-        rail.position.set(x + dx, ladderHeight/2, z);
-        rail.rotation.x = -0.1; // Slight lean
-        rail.castShadow = true;
-        scene.add(rail);
-    });
-    
-    // Rungs
-    const rungCount = Math.floor(ladderHeight / 0.35);
-    for (let i = 0; i < rungCount; i++) {
-        const rung = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 0.04, 0.04),
-            ladderMat
-        );
-        rung.position.set(x, 0.3 + i * 0.35, z + i * 0.035);
-        rung.castShadow = true;
-        scene.add(rung);
-    }
-    
-    // Top rail (rests on shelf top)
-    const topRail = new THREE.Mesh(
-        new THREE.BoxGeometry(0.6, 0.08, 0.15),
-        ladderMat
-    );
-    topRail.position.set(x, height - 0.3, z - 0.4);
-    scene.add(topRail);
-    
-    // Wheels at bottom
-    [-0.2, 0.2].forEach(dx => {
-        const wheel = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.05, 0.05, 0.04, 12),
-            metalMat
-        );
-        wheel.position.set(x + dx, 0.05, z);
-        wheel.rotation.z = Math.PI / 2;
-        scene.add(wheel);
-    });
-    
-    addCollider(x, ladderHeight/2, z, 0.6, ladderHeight, 0.15);
 }
 
 function createInteractiveBookZone(x, y, z, name, config) {
@@ -1509,27 +1452,6 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
 // PROPS
 // ============================================================================
 function createProps() {
-    // Ladder
-    const ladderMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight });
-    const ladderGroup = new THREE.Group();
-    
-    [-0.25, 0.25].forEach(dx => {
-        const rail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 3.5, 0.05), ladderMat);
-        rail.position.set(dx, 1.75, 0);
-        ladderGroup.add(rail);
-    });
-    
-    for (let i = 0; i < 10; i++) {
-        const rung = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.04), ladderMat);
-        rung.position.set(0, 0.3 + i * 0.35, 0);
-        ladderGroup.add(rung);
-    }
-    
-    ladderGroup.position.set(-4, 0, -6.3);
-    ladderGroup.rotation.x = -0.15;
-    scene.add(ladderGroup);
-    addCollider(-4, 1.75, -6.3, 0.6, 3.5, 0.2);
-    
     // === FIREPLACE LOUNGE ZONE ===
     createFireplaceLounge();
     
