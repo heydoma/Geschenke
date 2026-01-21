@@ -264,6 +264,8 @@ const bellGame = (() => {
         const totalTime = sequence.length * delay + 800;
         setTimeout(() => {
             state = 'waitingForInput';
+            // Re-render to ensure click handlers are attached
+            render();
             if (typeof showMessage === 'function') {
                 if (phase === 'forward') {
                     showMessage('🎶 Deine Reihenfolge...', 'info');
@@ -276,7 +278,10 @@ const bellGame = (() => {
     
     function handleBellClick(index) {
         // Eingaben nur im richtigen State erlauben
-        if (state !== 'waitingForInput') return;
+        if (state !== 'waitingForInput') {
+            console.log('Bell clicked but state is:', state);
+            return;
+        }
         
         // Glocke animieren und Ton spielen
         highlightBell(index, 350);
@@ -348,9 +353,17 @@ const bellGame = (() => {
             showMessage('💫 Nicht ganz... Versuche es nochmal.', 'error');
         }
         
-        // GLEICHE Sequenz erneut abspielen (keine neue!)
+        // Spieler kann es nochmal versuchen OHNE dass die Sequenz neu abgespielt wird
         setTimeout(() => {
-            playSequence();
+            playerSequence = [];  // Nur Eingabe zurücksetzen
+            state = 'waitingForInput';  // Wieder auf Eingabe warten
+            if (typeof showMessage === 'function') {
+                if (phase === 'forward') {
+                    showMessage('🎶 Nochmal... von vorne.', 'info');
+                } else {
+                    showMessage('⚡ Nochmal RÜCKWÄRTS!', 'info');
+                }
+            }
         }, 1500);
     }
     

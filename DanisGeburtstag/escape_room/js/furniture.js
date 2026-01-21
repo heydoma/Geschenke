@@ -128,9 +128,8 @@ function createBookshelves() {
     createBookshelf(-w/2 + 0.5, 0, -d/2 + 3, Math.PI/2, null, null, true);
     createBookshelf(-w/2 + 0.5, 0, 5, Math.PI/2, null, null, true);
     
-    // Side wall shelves (right wall - alchemy area)
-    // The first one (z=-4) is now interactive for book sorting game
-    createBookshelf(w/2 - 0.5, 0, -4, -Math.PI/2, 'bookshelfLeft', CONFIG.interactives.bookshelfLeft, false);
+    // Side wall shelves (right wall - alchemy area) - all decorative now
+    createBookshelf(w/2 - 0.5, 0, -4, -Math.PI/2, null, null, true);
     createBookshelf(w/2 - 0.5, 0, 0, -Math.PI/2, null, null, true);
     createBookshelf(w/2 - 0.5, 0, 4, -Math.PI/2, null, null, true);
     
@@ -1183,6 +1182,101 @@ function createBells() {
     );
     interactZone.position.set(x, y, z);
     interactZone.userData = { type: 'bells', ...CONFIG.interactives.bells };
+    interactiveObjects.push(interactZone);
+    scene.add(interactZone);
+}
+
+function createWallKey() {
+    // GROSSER, SICHTBARER Schlüssel-Vitrine - LINKS NEBEN dem Alchemie-Tisch (potions)
+    const w = CONFIG.room.width;
+    const d = CONFIG.room.depth;
+    
+    // Position: Links neben der Alchemy Station (die ist bei x=4, z=-d/2+1.2)
+    // Wir setzen die Vitrine an die Vorderwand, links vom Alchemietisch
+    const x = 1.5;           // Links vom Alchemietisch (der ist bei x=4)
+    const y = 1.5;           // Augenhöhe
+    const z = -d/2 + 0.2;    // An der Vorderwand
+    
+    const goldMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffd700, 
+        metalness: 0.9, 
+        roughness: 0.1,
+        emissive: 0xffa500,
+        emissiveIntensity: 0.3
+    });
+    const glassMat = new THREE.MeshStandardMaterial({ 
+        color: 0x8899aa,
+        transparent: true,
+        opacity: 0.3,
+        roughness: 0.1,
+        metalness: 0.2
+    });
+    const woodMat = new THREE.MeshStandardMaterial({ 
+        color: 0x4a3520, 
+        roughness: 0.7 
+    });
+    
+    // Größerer Holzrahmen/Vitrine - an der WAND befestigt
+    const frameBack = new THREE.Mesh(
+        new THREE.BoxGeometry(0.8, 1.0, 0.15),
+        woodMat
+    );
+    frameBack.position.set(x, y, z);
+    scene.add(frameBack);
+    
+    // Glasfront
+    const glass = new THREE.Mesh(
+        new THREE.BoxGeometry(0.65, 0.85, 0.02),
+        glassMat
+    );
+    glass.position.set(x, y, z + 0.1);
+    scene.add(glass);
+    
+    // GROSSER Schlüssel - orientiert für Vorderwand (zeigt in den Raum +Z)
+    // Key bow (the round top part) - VIEL GRÖSSER
+    const keyBow = new THREE.Mesh(
+        new THREE.TorusGeometry(0.15, 0.035, 12, 24),
+        goldMat
+    );
+    keyBow.position.set(x, y + 0.2, z + 0.08);
+    keyBow.rotation.x = Math.PI / 2;
+    scene.add(keyBow);
+    
+    // Key stem - GRÖSSER
+    const keyStem = new THREE.Mesh(
+        new THREE.BoxGeometry(0.04, 0.45, 0.04),
+        goldMat
+    );
+    keyStem.position.set(x, y - 0.1, z + 0.08);
+    scene.add(keyStem);
+    
+    // Key bit (the teeth) - GRÖSSER
+    const keyBit1 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 0.06, 0.04),
+        goldMat
+    );
+    keyBit1.position.set(x + 0.04, y - 0.28, z + 0.08);
+    scene.add(keyBit1);
+    
+    const keyBit2 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.06, 0.1, 0.04),
+        goldMat
+    );
+    keyBit2.position.set(x - 0.04, y - 0.22, z + 0.08);
+    scene.add(keyBit2);
+    
+    // Starker Glow für Sichtbarkeit
+    const keyGlow = new THREE.PointLight(0xffd700, 1.5, 4);
+    keyGlow.position.set(x, y, z + 0.5);
+    scene.add(keyGlow);
+    
+    // Interactive zone - GRÖSSER für leichteres Finden
+    const interactZone = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 1.5, 1.0),
+        new THREE.MeshBasicMaterial({ visible: false })
+    );
+    interactZone.position.set(x, y, z + 0.5);
+    interactZone.userData = { type: 'wallKey', ...CONFIG.interactives.wallKey };
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
 }

@@ -5,24 +5,24 @@
 
 const pensieve = (() => {
     // === KONSTANTEN ===
-    // Die Artefakte aus den vorherigen Spielen
+    // Die Artefakte aus den vorherigen Spielen (NEUE ZUORDNUNG)
     const ARTIFACTS = [
         { id: 1, name: '🧪 Phiole', fullName: 'Beschriftete Phiole', game: 1 },
-        { id: 2, name: '📖 Pergament', fullName: 'Flüsterndes Pergament', game: 2 },
+        { id: 2, name: '🔑 Schlüssel', fullName: 'Goldener Schlüssel', game: 2 },  // Key Catch ist jetzt Game 2!
         { id: 3, name: '📜 Chiffre', fullName: 'Entschlüsseltes Pergament', game: 3 },
-        { id: 4, name: '🪜 Schlüssel', fullName: 'Treppen-Schlüssel', game: 4 },
+        { id: 4, name: '🪜 Treppe', fullName: 'Treppen-Fragment', game: 4 },
         { id: 5, name: '△ Symbol', fullName: 'Heiligtümer des Todes', game: 5 },
         { id: 6, name: '🔔 Klang', fullName: 'Glocken-Erinnerung', game: 6 },
-        { id: 7, name: '📚 Chronik', fullName: 'Chronik der Ereignisse', game: 7 }
+        { id: 7, name: '📖 Pergament', fullName: 'Flüsterndes Pergament', game: 7 }  // Whispering Books ist jetzt Game 7!
     ];
     
     // Die korrekte Reihenfolge (4 Artefakte)
     // Basiert auf Hinweisen aus den Spielen:
     // - Game 3 (Cipher) gibt eine Zahl
     // - Game 4 (Treppen) - Die Route
-    // - Die Reihenfolge: Heiligtümer → Glocken → Chronik → Chiffre
-    // (Symbol erkennen → Melodie merken → Geschichte ordnen → Code entschlüsseln)
-    const CORRECT_ORDER = [5, 6, 7, 3]; // Die IDs der Artefakte
+    // - Die Reihenfolge: Heiligtümer → Glocken → Schlüssel → Chiffre
+    // (Symbol erkennen → Melodie merken → Schlüssel finden → Code entschlüsseln)
+    const CORRECT_ORDER = [5, 6, 2, 3]; // Die IDs der Artefakte (Schlüssel ist jetzt ID 2!)
     
     // === ZUSTAND ===
     let state = 'idle'; // idle, placingMemories, checking, success

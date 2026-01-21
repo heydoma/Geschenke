@@ -115,28 +115,35 @@ function startFootstepsAnimation() {
     // Path from Schlafzimmer (bedroom) to Wohnzimmer (living room)
     // Coordinates are percentages (x%, y%) of the map image
     // Adjust these values to match your karte.png layout!
-    const path = [
-        // Schlafzimmer (start - top area)
-        { x: 70, y: 20 },
-        { x: 68, y: 24 },
-        { x: 65, y: 28 },
-        // Durch die Tür in den Flur
-        { x: 60, y: 32 },
-        { x: 55, y: 36 },
-        { x: 50, y: 40 },
-        // Flur entlang
-        { x: 45, y: 44 },
-        { x: 40, y: 48 },
-        { x: 35, y: 52 },
-        // Richtung Wohnzimmer
-        { x: 32, y: 56 },
-        { x: 30, y: 60 },
-        { x: 28, y: 64 },
-        // Wohnzimmer (Ziel)
-        { x: 27, y: 68 },
-        { x: 26, y: 72 },
-        { x: 25, y: 75 },
+  const path = [
+    // Schlafzimmer (Start – mittig)
+    { x: 45, y: 65 },
+    { x: 48, y: 65 },
+    { x: 51, y: 65 },
+
+    // Nach rechts in den Flur
+    { x: 54, y: 65 },
+    { x: 57, y: 65 },
+    { x: 60, y: 65 },
+
+    // Im Flur nach oben
+    { x: 60, y: 62 },
+    { x: 60, y: 59 },
+    { x: 60, y: 56 },
+    { x: 60, y: 53 },
+
+    // Nach links ins Wohnzimmer
+    { x: 57, y: 53 },
+    { x: 54, y: 53 },
+    { x: 51, y: 53 },
+    { x: 48, y: 53 },
+    { x: 45, y: 53 },
+
+    // Wohnzimmer (Ziel – leicht reinlaufen)
+    { x: 42, y: 53 },
+    { x: 40, y: 53 }
     ];
+
     
     animateFootstepsAlongPath(path, 0);
 }

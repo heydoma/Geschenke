@@ -13,8 +13,8 @@ const CONFIG = {
     
     // Movement (slow, calm exploration pace)
     movement: {
-        walkSpeed: 1.8,           // Normal walking (m/s) - slow exploration
-        sprintSpeed: 3.2,         // Sprinting (m/s)
+        walkSpeed: 3.2,           // Normal walking (m/s) - slow exploration
+        sprintSpeed: 5.2,         // Sprinting (m/s)
         acceleration: 8,          // Smooth acceleration
         deceleration: 6,          // Smooth deceleration
         mouseSensitivity: 0.001,  // Mouse look speed
@@ -109,8 +109,8 @@ const CONFIG = {
     interactives: {
         fireplace: { game: null, hint: "Das Feuer knistert..." },
         orb: { game: 5, hint: "Ein mystisches Leuchten..." },
-        bookshelfLeft: { game: 7, hint: "Die Bücher sind ungeordnet..." },
-        bookshelfRight: { game: 2, hint: "Diese Bücher flüstern..." },
+        wallKey: { game: 2, hint: "Fliegende Schlüssel schwirren herum..." },  // Key-Spiel ist jetzt Game 2
+        bookshelfRight: { game: 7, hint: "Diese Bücher flüstern..." },  // Bücher sind jetzt Game 7
         desk: { game: 3, hint: "Verschlüsselte Runen..." },
         potions: { game: 1, hint: "Seltsame Tränke..." },
         bells: { game: 6, hint: "Ein magisches Glockenspiel..." },

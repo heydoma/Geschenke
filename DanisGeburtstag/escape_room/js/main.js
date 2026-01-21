@@ -95,6 +95,7 @@ function init() {
     createMagicOrb();
     createPotionShelf();
     createBells();
+    createWallKey();
     createStairs();
     createMezzanine();
     createProps();
@@ -222,6 +223,20 @@ window.addEventListener('load', () => {
                 modal.style.display = 'none';
             }
             isMinigameOpen = false;
+        });
+    });
+    
+    // WICHTIG: Alle Klicks in Minigame-Modals stoppen die Propagation
+    // Das verhindert dass der 3D-Welt onClick Handler aufgerufen wird
+    document.querySelectorAll('.minigame-modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        modal.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+        });
+        modal.addEventListener('mouseup', function(e) {
+            e.stopPropagation();
         });
     });
     

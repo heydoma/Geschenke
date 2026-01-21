@@ -98,13 +98,15 @@
                 „Jede Zutat in den richtigen Kessel..."
             </p>
             <div style="background: rgba(0,0,0,0.3); border: 1px solid #8b7355; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                <p style="color: #a89888; font-size: 13px; text-align: center; margin-bottom: 10px;">📜 Rezept:</p>
-                <ul style="color: #d4c4a8; font-size: 14px; list-style: none; padding: 0; text-align: center;">
-                    <li>• Kupfer: Fluxkraut + Blutegel</li>
-                    <li>• Eisen: Knöterich + Florfliegen</li>
-                    <li>• Zinn: Fluxkraut + Florfliegen</li>
-                    <li>• Stein: Knöterich + Blutegel</li>
-                </ul>
+                <p style="color: #a89888; font-size: 13px; text-align: center; margin-bottom: 10px;">📜 Aus dem verbotenen Rezept:</p>
+                <div style="color: #c9b896; font-size: 13px; font-style: italic; line-height: 1.8; text-align: center;">
+                    <p>„Das Kraut des Flusses meidet den rotbraunen Kessel,</p>
+                    <p>doch der Sauger des Blutes braucht dessen Wärme."</p>
+                    <p style="margin-top: 8px;">„Der gefleckte Falter sucht das höchste Feuer,</p>
+                    <p>während das Gras der Knoten das kalte Grau bevorzugt."</p>
+                    <p style="margin-top: 8px;">„Egel rechts vom dunklen Eisen,</p>
+                    <p>und das Fließende links vom Letzten."</p>
+                </div>
             </div>
             <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 30px;">
                 <div style="text-align: center;"><div class="cauldron" data-cauldron="copper" style="width: 100px; height: 120px; background: linear-gradient(135deg, #b87333, #8b5a2b); border-radius: 10px 10px 50px 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid #cd7f32; box-shadow: inset 0 -20px 30px rgba(0,0,0,0.3);"></div><p style="margin-top: 8px; color: #cd7f32;">Kupfer</p></div>
@@ -123,19 +125,20 @@
     </div>
 </div>
 
-<!-- Minigame 2: Whispering Books -->
+<!-- Minigame 2: Key Catch (Fliegende Schlüssel) -->
 <div class="minigame-modal" id="minigame2">
-    <div class="modal-content" style="max-width: 900px;">
+    <div class="modal-content" style="max-width: 600px;">
         <div class="modal-header">
-            <h2 class="modal-title">📖 Die Flüsternden Buchrücken</h2>
+            <h2 class="modal-title">🔑 Fliegende Schlüssel</h2>
             <div class="modal-controls">
                 <button class="btn btn-hint" onclick="showHint(2)">💡</button>
-                <button class="btn btn-reset" onclick="whisperingBooks.reset()">🔄</button>
+                <button class="btn btn-reset" onclick="keyCatch.reset()">🔄</button>
                 <button class="btn btn-close" onclick="closeMinigame(2)">✕</button>
             </div>
         </div>
         <div class="modal-body">
-            <div id="whisperingBooksContainer"></div>
+            <p style="text-align: center; color: #d4c4a8; font-style: italic; margin-bottom: 15px;">„Nur einer öffnet die Tür zur Wahrheit...“</p>
+            <div id="keyContainer"></div>
         </div>
     </div>
 </div>
@@ -215,20 +218,19 @@
     </div>
 </div>
 
-<!-- Minigame 7: Book Sort -->
+<!-- Minigame 7: Whispering Books -->
 <div class="minigame-modal" id="minigame7">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 900px;">
         <div class="modal-header">
-            <h2 class="modal-title">📚 Die Chronik</h2>
+            <h2 class="modal-title">📖 Die Flüsternden Buchrücken</h2>
             <div class="modal-controls">
                 <button class="btn btn-hint" onclick="showHint(7)">💡</button>
-                <button class="btn btn-reset" onclick="initBookSort()">🔄</button>
+                <button class="btn btn-reset" onclick="if(typeof whisperingBooks !== 'undefined') whisperingBooks.reset()">🔄</button>
                 <button class="btn btn-close" onclick="closeMinigame(7)">✕</button>
             </div>
         </div>
         <div class="modal-body">
-            <p style="text-align: center; color: #d4c4a8; font-style: italic; margin-bottom: 15px;">„Die Geschichte muss in der richtigen Reihenfolge erzählt werden..."</p>
-            <div id="bookShelf"></div>
+            <div id="whisperingBooksContainer"></div>
         </div>
     </div>
 </div>
@@ -392,7 +394,6 @@
                 color: #d4c4a8;
                 font-style: italic;
             ">
-                <p style="margin: 0; font-size: 14px;">„Die Fußstapfen wandern von den Schlafzimmern ins Wohnzimmer..."</p>
                 <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7;">Unheil angerichtet!</p>
             </div>
         </div>
@@ -414,7 +415,7 @@
 <script src="../games/game4-staircase.js"></script>
 <script src="../games/game5-invisibleink.js"></script>
 <script src="../games/game6-bells.js"></script>
-<script src="../games/game7-booksort.js"></script>
+<script src="../games/game7-keycatch.js"></script>
 <script src="../games/game8-pensieve.js"></script>
 
 <!-- ESCAPE ROOM SCRIPTS -->

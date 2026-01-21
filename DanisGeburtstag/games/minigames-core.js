@@ -60,14 +60,14 @@ function resetMinigame(minigameNum) {
 
 function showHint(minigameNum) {
     const hints = [
-        'Logik ist der Schlüssel. Schließe aus, was nicht sein kann.',
-        'Gold, lang leuchtend, mit Stern-Symbol – finde alle vier in der richtigen Reihenfolge.',
-        'Der Kontext verrät die Bedeutung. Welches Wort passt?',
-        'Plane voraus. Jede Bewegung hat Konsequenzen.',
-        'Geduld und sanfte Bewegungen. Zu viel Hitze zerstört.',
-        'Erst vorwärts, dann rückwärts. Die Zeit kehrt sich um.',
-        'Vom Stein zum Tod. Die Reihenfolge der Bände.',
-        'Die Erinnerungen müssen in der richtigen Reihenfolge sein.'
+        'Logik ist der Schlüssel. Schließe aus, was nicht sein kann.',  // 1: Polyjuice
+        'Der goldene Schlüssel glänzt anders. Klicke weise - falsche Schlüssel kosten Zeit!',  // 2: Key Catch
+        'Der Kontext verrät die Bedeutung. Welches Wort passt?',  // 3: Cipher
+        'Plane voraus. Jede Bewegung hat Konsequenzen.',  // 4: Staircase
+        'Geduld und sanfte Bewegungen. Zu viel Hitze zerstört.',  // 5: Invisible Ink
+        'Erst vorwärts, dann rückwärts. Die Zeit kehrt sich um.',  // 6: Bells
+        'Gold, lang leuchtend, mit Stern-Symbol – finde alle vier in der richtigen Reihenfolge.',  // 7: Whispering Books
+        'Die Erinnerungen müssen in der richtigen Reihenfolge sein.'  // 8: Pensieve
     ];
     showMessage(`💡 Hinweis: ${hints[minigameNum - 1]}`, 'hint');
 }
@@ -123,12 +123,12 @@ function solveMinigame(minigameNum, artifact, number = null) {
 function initMinigame(num) {
     switch(num) {
         case 1: polyjuiceGame.init(); break;
-        case 2: initAudioBalance(); break;
+        case 2: initKeyCatch(); break;  // Game 2 ist jetzt das Schlüssel-Fangspiel
         case 3: initCipher(); break;
         case 4: initStaircase(); break;
         case 5: initInvisibleInk(); break;
         case 6: initBellGame(); break;
-        case 7: initBookSort(); break;
+        case 7: initBookSort(); break;  // Game 7 sind die flüsternden Bücher
         case 8: initPensieve(); break;
     }
 }

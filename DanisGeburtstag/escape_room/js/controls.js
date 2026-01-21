@@ -157,6 +157,12 @@ function onKeyUp(e) {
 function onClick(e) {
     if (!gameStarted) return;
     
+    // WICHTIG: Keine Interaktion wenn ein Minigame offen ist!
+    if (isMinigameOpen) return;
+    
+    // Auch nicht wenn der Klick auf einem Modal oder Button ist
+    if (e.target.closest('.minigame-modal') || e.target.closest('.btn')) return;
+    
     if (bookPopup.classList.contains('visible')) {
         bookPopup.classList.remove('visible');
         return;

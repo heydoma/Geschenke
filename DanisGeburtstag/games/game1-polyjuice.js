@@ -32,11 +32,29 @@ const polyjuiceGame = (() => {
         ingredients = document.querySelectorAll('#minigame1 .ingredient');
         checkBtn = document.getElementById('checkPolyjuiceBtn');
 
+        // Reset state on init (wichtig beim erneuten Öffnen des Modals)
+        state = 'idle';
+        Object.keys(placements).forEach(key => {
+            placements[key] = null;
+        });
+        
+        // Clear any existing cauldron contents
+        cauldrons.forEach(cauldron => {
+            cauldron.classList.remove('success', 'error', 'drop-target');
+            const content = cauldron.querySelector('.cauldron-content');
+            if (content) content.remove();
+        });
+        
+        // Show all ingredients again
+        ingredients.forEach(ingredient => {
+            ingredient.classList.remove('placed', 'dragging');
+        });
+
         setupDragAndDrop();
         updateCheckButton();
     }
-
-    // Setup Drag & Drop
+    
+    // Setup Drag & Drop - Wird JEDES Mal neu gemacht weil DOM-Elemente sich ändern können
     function setupDragAndDrop() {
         // Ingredient drag events
         ingredients.forEach(ingredient => {
