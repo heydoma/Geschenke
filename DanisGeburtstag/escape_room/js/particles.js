@@ -317,3 +317,24 @@ function updateFloatingCandles(time) {
         }
     });
 }
+
+// ============================================================================
+// FLOATING STAIRS ANIMATION
+// ============================================================================
+function updateFloatingStairs(time) {
+    if (!window.floatingStairs) return;
+    
+    window.floatingStairs.forEach((stairsGroup, index) => {
+        // Slow rotation of the whole group
+        stairsGroup.rotation.y = time * 0.15;
+        
+        // Gentle bobbing up and down
+        stairsGroup.position.y = 1.5 + Math.sin(time * 0.8) * 0.1;
+        
+        // Each segment also rotates independently
+        stairsGroup.children.forEach((segment, i) => {
+            segment.rotation.z = Math.sin(time * 0.5 + i) * 0.1;
+            segment.position.y += Math.sin(time * 1.2 + i * 0.7) * 0.001;
+        });
+    });
+}

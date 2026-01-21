@@ -153,6 +153,9 @@ function animate() {
     // Update floating candles
     updateFloatingCandles(time);
     
+    // Update floating stairs
+    updateFloatingStairs(time);
+    
     renderer.render(scene, camera);
 }
 

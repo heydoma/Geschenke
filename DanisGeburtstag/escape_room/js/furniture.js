@@ -1233,16 +1233,71 @@ function createBells() {
 }
 
 function createStairs() {
-    // Stairs puzzle trigger - now hidden near the alchemy station
-    // It's a magical puzzle, doesn't need to be at actual stairs
+    // Floating miniature stairs in back left corner (under balcony stairs)
+    // Hidden magical element that triggers the staircase puzzle
     const w = CONFIG.room.width;
+    const d = CONFIG.room.depth;
     
-    // Single trigger near the alchemy station on right wall
+    const x = -w/2 + 2.5;  // Left side
+    const y = 1.5;          // Floating height
+    const z = d/2 - 3;      // Back corner, under balcony
+    
+    const woodMat = new THREE.MeshStandardMaterial({ 
+        color: 0x8b7355, 
+        roughness: 0.6,
+        emissive: 0x221100,
+        emissiveIntensity: 0.1
+    });
+    
+    // Create floating miniature staircase segments
+    const stairsGroup = new THREE.Group();
+    
+    // 5 small floating stair segments that rotate slowly
+    for (let i = 0; i < 5; i++) {
+        const segment = new THREE.Group();
+        
+        // Small staircase piece (3 steps)
+        for (let s = 0; s < 3; s++) {
+            const step = new THREE.Mesh(
+                new THREE.BoxGeometry(0.15, 0.03, 0.08),
+                woodMat
+            );
+            step.position.set(0, s * 0.04, s * 0.05);
+            segment.add(step);
+        }
+        
+        // Position each segment floating around
+        const angle = (i / 5) * Math.PI * 2;
+        const radius = 0.4;
+        segment.position.set(
+            Math.cos(angle) * radius,
+            Math.sin(i * 0.5) * 0.2,
+            Math.sin(angle) * radius
+        );
+        segment.rotation.y = angle + Math.PI / 2;
+        segment.rotation.x = Math.random() * 0.3 - 0.15;
+        
+        stairsGroup.add(segment);
+    }
+    
+    stairsGroup.position.set(x, y, z);
+    scene.add(stairsGroup);
+    
+    // Store reference for animation
+    if (!window.floatingStairs) window.floatingStairs = [];
+    window.floatingStairs.push(stairsGroup);
+    
+    // Soft magical glow
+    const stairsGlow = new THREE.PointLight(0xaa8866, 0.3, 2);
+    stairsGlow.position.set(x, y, z);
+    scene.add(stairsGlow);
+    
+    // Interactive trigger zone
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 2, 2),
+        new THREE.BoxGeometry(1.5, 2, 1.5),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    interactZone.position.set(w/2 - 2, 1.5, -6);  // Near front right corner, by alchemy station
+    interactZone.position.set(x, y, z);
     interactZone.userData = { type: 'stairs', ...CONFIG.interactives.stairs };
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
