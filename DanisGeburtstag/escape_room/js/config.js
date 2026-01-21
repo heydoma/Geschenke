@@ -50,12 +50,12 @@ const CONFIG = {
         startRotY: 0              // Facing into room (toward fireplace)
     },
     
-    // Particles (reduced for performance)
+    // Particles (optimized for performance)
     particles: {
-        dustCount: 200,           // Floating dust motes
-        fireCount: 100,           // Fire particles
-        emberCount: 20,           // Floating embers
-        orbDustCount: 40          // Magical dust near orb
+        dustCount: 60,            // Floating dust motes (reduced)
+        fireCount: 40,            // Fire particles (reduced)
+        emberCount: 8,            // Floating embers (reduced)
+        orbDustCount: 15          // Magical dust near orb (reduced)
     },
     
     // Lighting (brighter moon for visibility)

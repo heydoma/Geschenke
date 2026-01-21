@@ -70,19 +70,20 @@ function init() {
     camera.rotation.y = CONFIG.player.startRotY;
     euler.y = CONFIG.player.startRotY;
     
-    // Renderer
+    // Renderer - optimized for performance
     const canvas = document.getElementById('game-canvas');
     renderer = new THREE.WebGLRenderer({ 
         canvas, 
-        antialias: true,
-        powerPreference: "high-performance"
+        antialias: false,  // Disabled for performance
+        powerPreference: "high-performance",
+        stencil: false,
+        depth: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));  // Limit pixel ratio for performance
+    renderer.shadowMap.enabled = false;  // Shadows disabled for performance
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.85;
+    renderer.toneMappingExposure = 0.9;  // Slightly brighter to compensate
     renderer.outputEncoding = THREE.sRGBEncoding;
     
     // Build scene

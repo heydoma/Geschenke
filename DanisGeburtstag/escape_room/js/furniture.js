@@ -1837,75 +1837,64 @@ function createCandelabra(x, y, z) {
 // FLOATING CANDLES → CHANDELIERS & WALL SCONCES (physically anchored)
 // ============================================================================
 function createFloatingCandles() {
-    // Floating candles throughout the room - Harry Potter style
-    // Candles float magically in the air with a soft glow
+    // Floating candles - OPTIMIZED for performance
+    // Reduced count, fewer lights
     
-    // Main cluster above center
-    for (let i = 0; i < 15; i++) {
-        const fx = (Math.random() - 0.5) * 12;
-        const fy = 6 + Math.random() * 4;
-        const fz = (Math.random() - 0.5) * 10;
+    // Main cluster above center (reduced from 15 to 6)
+    for (let i = 0; i < 6; i++) {
+        const fx = (Math.random() - 0.5) * 10;
+        const fy = 6 + Math.random() * 3;
+        const fz = (Math.random() - 0.5) * 8;
         createFloatingCandle(fx, fy, fz);
     }
     
-    // Cluster above desk area
-    for (let i = 0; i < 8; i++) {
-        const fx = (Math.random() - 0.5) * 4;
-        const fy = 4 + Math.random() * 3;
-        const fz = -3 + (Math.random() - 0.5) * 3;
+    // Cluster above desk area (reduced from 8 to 3)
+    for (let i = 0; i < 3; i++) {
+        const fx = (Math.random() - 0.5) * 3;
+        const fy = 4 + Math.random() * 2;
+        const fz = -3 + (Math.random() - 0.5) * 2;
         createFloatingCandle(fx, fy, fz);
     }
     
-    // Keep some wall sconces for variety
-    createGrandChandelier(0, 8, -1);  // One central chandelier
-    // No small chandeliers, just floating candles
+    // One central chandelier
+    createGrandChandelier(0, 8, -1);
     
-    // Wall sconces along the walls
-    createWallSconce(-8.5, 3, -3, Math.PI/2);
-    createWallSconce(-8.5, 3, 1, Math.PI/2);
-    createWallSconce(8.5, 3, -3, -Math.PI/2);
-    createWallSconce(8.5, 3, 1, -Math.PI/2);
+    // Wall sconces (reduced from 6 to 4)
+    createWallSconce(-8.5, 3, -1, Math.PI/2);
+    createWallSconce(8.5, 3, -1, -Math.PI/2);
     createWallSconce(-4, 3, -6.8, 0);
     createWallSconce(4, 3, -6.8, 0);
     
-    // A few magical floating candles near magical areas (orb, pensieve) - with visible magic glow
-    createMagicalCandle(0.5, 2.5, -2.5);  // Near orb
-    createMagicalCandle(1.2, 2.3, -2.8);  // Near orb
-    createMagicalCandle(-0.3, 2.4, -3.2); // Near desk
+    // One magical candle near orb
+    createMagicalCandle(0.5, 2.5, -2.5);
 }
 
-// Single floating candle with magical glow
+// Single floating candle - NO individual lights for performance
 function createFloatingCandle(x, y, z) {
     const candleMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e6, roughness: 0.3 });
     const flameMat = new THREE.MeshStandardMaterial({ 
         color: 0xffaa33, 
         emissive: 0xff6600, 
-        emissiveIntensity: 0.8 
+        emissiveIntensity: 1.2  // Brighter emissive to compensate for no light
     });
     
     // Candle body (tall and thin)
     const candleHeight = 0.15 + Math.random() * 0.1;
     const candle = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.015, 0.02, candleHeight, 8),
+        new THREE.CylinderGeometry(0.015, 0.02, candleHeight, 6),  // Reduced segments
         candleMat
     );
     candle.position.set(x, y, z);
     scene.add(candle);
     
-    // Flame
+    // Flame with bright emissive (no point light needed)
     const flame = new THREE.Mesh(
-        new THREE.ConeGeometry(0.012, 0.04, 8),
+        new THREE.ConeGeometry(0.012, 0.04, 6),  // Reduced segments
         flameMat
     );
     flame.position.set(x, y + candleHeight/2 + 0.02, z);
     scene.add(flame);
-    
-    // Soft point light (only some candles have lights for performance)
-    if (Math.random() < 0.3) {
-        const candleLight = new THREE.PointLight(0xff9944, 0.3, 3);
-        candleLight.position.set(x, y + candleHeight/2, z);
-        scene.add(candleLight);
-    }
+    // NO point light - emissive material provides glow effect
 }
 
 function createGrandChandelier(x, y, z) {
@@ -1920,29 +1909,25 @@ function createGrandChandelier(x, y, z) {
         roughness: 0.2 
     });
     
-    // Chain from ceiling
-    const chainLinks = 8;
-    for (let i = 0; i < chainLinks; i++) {
-        const link = new THREE.Mesh(
-            new THREE.TorusGeometry(0.05, 0.015, 8, 12),
-            metalMat
-        );
-        link.position.set(x, CONFIG.room.height - 0.3 - i * 0.15, z);
-        link.rotation.x = i % 2 === 0 ? 0 : Math.PI / 2;
-        scene.add(link);
-    }
+    // Simplified chain (cylinder instead of individual links)
+    const chain = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.02, 0.02, 2.5, 6),
+        metalMat
+    );
+    chain.position.set(x, CONFIG.room.height - 1.5, z);
+    scene.add(chain);
     
-    // Central hub
+    // Central hub (reduced segments)
     const hub = new THREE.Mesh(
-        new THREE.SphereGeometry(0.15, 16, 16),
+        new THREE.SphereGeometry(0.15, 8, 8),
         goldMat
     );
     hub.position.set(x, y + 0.3, z);
     scene.add(hub);
     
-    // Main ring
+    // Main ring (reduced segments)
     const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(0.8, 0.04, 12, 32),
+        new THREE.TorusGeometry(0.8, 0.04, 8, 16),
         metalMat
     );
     ring.position.set(x, y, z);
