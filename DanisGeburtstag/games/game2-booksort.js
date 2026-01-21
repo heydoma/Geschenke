@@ -350,9 +350,23 @@ const bookSort = (() => {
 
 // Globale Funktionen für HTML
 function initBookSort() {
-    bookSort.init();
+    sortBooks.init();  // Ruft den Wrapper auf, nicht direkt bookSort!
 }
 
 function resetBookSort() {
-    bookSort.reset();
+    sortBooks.reset();
 }
+
+// --- WRAPPER für Minigame 7 (sortBooks) ---
+const sortBooks = {
+    init() {
+        // Mount book sort into #sortBooksContainer
+        const container = document.getElementById('sortBooksContainer');
+        if (!container) return;
+        container.innerHTML = '<div id="bookShelf"></div>';
+        bookSort.init();
+    },
+    reset() {
+        bookSort.reset();
+    }
+};

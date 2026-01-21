@@ -218,19 +218,19 @@
     </div>
 </div>
 
-<!-- Minigame 7: Whispering Books -->
+<!-- Minigame 7: sort Books -->
 <div class="minigame-modal" id="minigame7">
     <div class="modal-content" style="max-width: 900px;">
         <div class="modal-header">
             <h2 class="modal-title">📖 Die Flüsternden Buchrücken</h2>
             <div class="modal-controls">
                 <button class="btn btn-hint" onclick="showHint(7)">💡</button>
-                <button class="btn btn-reset" onclick="if(typeof whisperingBooks !== 'undefined') whisperingBooks.reset()">🔄</button>
+                <button class="btn btn-reset" onclick="if(typeof sortBooks !== 'undefined') sortBooks.reset()">🔄</button>
                 <button class="btn btn-close" onclick="closeMinigame(7)">✕</button>
             </div>
         </div>
         <div class="modal-body">
-            <div id="whisperingBooksContainer"></div>
+            <div id="sortBooksContainer"></div>
         </div>
     </div>
 </div>
@@ -410,12 +410,12 @@
 <!-- MINIGAME SCRIPTS (relative to parent folder) -->
 <script src="../games/minigames-core.js"></script>
 <script src="../games/game1-polyjuice.js"></script>
-<script src="../games/game2-muffliato.js"></script>
 <script src="../games/game3-cipher.js"></script>
 <script src="../games/game4-staircase.js"></script>
 <script src="../games/game5-invisibleink.js"></script>
 <script src="../games/game6-bells.js"></script>
 <script src="../games/game7-keycatch.js"></script>
+<script src="../games/game2-booksort.js"></script>
 <script src="../games/game8-pensieve.js"></script>
 
 <!-- ESCAPE ROOM SCRIPTS -->

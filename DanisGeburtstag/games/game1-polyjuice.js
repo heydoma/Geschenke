@@ -114,11 +114,14 @@ const polyjuiceGame = (() => {
 
         // Update UI
         const cauldron = document.querySelector(`#minigame1 [data-cauldron="${cauldronType}"]`);
-        const icon = ingredientElement.querySelector('.ingredient-icon').textContent;
+        // Hol das Emoji aus dem ersten span
+        const iconSpan = ingredientElement.querySelector('span');
+        const icon = iconSpan ? iconSpan.textContent : '✨';
 
         const content = document.createElement('div');
         content.className = 'cauldron-content';
         content.textContent = icon;
+        content.style.cssText = 'font-size: 40px;';
         cauldron.appendChild(content);
 
         // Hide ingredient from ingredients area

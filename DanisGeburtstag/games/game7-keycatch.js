@@ -5,10 +5,10 @@
 
 const keyCatch = (() => {
     // === KONSTANTEN ===
-    const TOTAL_KEYS = 25;  // Viele ablenkende Schlüssel
+    const TOTAL_KEYS = 40;  // Viele ablenkende Schlüssel
     const CATCH_TIME = 20000;  // 20 Sekunden Zeit
     const KEY_SPEED_MIN = 1;
-    const KEY_SPEED_MAX = 4;
+    const KEY_SPEED_MAX = 5;
     
     // === ZUSTAND ===
     let state = 'idle'; // idle, playing, success, failed
