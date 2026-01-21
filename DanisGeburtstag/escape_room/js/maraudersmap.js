@@ -1,18 +1,87 @@
 // ============================================================================
 // MARAUDER'S MAP - Die Karte des Rumtreibers
 // Animated footsteps from bedroom to living room (Harry Potter style)
+// Only unlocks after all 7 puzzles are solved!
 // ============================================================================
 
 let mapAnimationRunning = false;
 let footstepElements = [];
+let mapUnlocked = false;
 
 function openMaraudersMap() {
     const modal = document.getElementById('maraudersMapModal');
     if (modal) {
         modal.style.display = 'flex';
         isMinigameOpen = true;
-        // Start footsteps animation after a short delay
-        setTimeout(startFootstepsAnimation, 500);
+        
+        // Check if all puzzles are solved
+        checkMapUnlockStatus();
+    }
+}
+
+function checkMapUnlockStatus() {
+    // Count solved puzzles (gameState is from minigames-core.js)
+    let solvedCount = 0;
+    if (typeof gameState !== 'undefined' && gameState.solved) {
+        for (let i = 0; i < 7; i++) {
+            if (gameState.solved[i]) solvedCount++;
+        }
+    }
+    
+    const footstepsContainer = document.getElementById('footstepsContainer');
+    const mapImage = document.getElementById('mapImage');
+    const footstepsLabel = document.getElementById('footstepsLabel');
+    const lockedMessage = document.getElementById('mapLockedMessage');
+    const unlockSpell = document.getElementById('mapUnlockSpell');
+    
+    if (solvedCount >= 7) {
+        // ALL PUZZLES SOLVED - Reveal the map!
+        if (!mapUnlocked) {
+            mapUnlocked = true;
+            
+            // Hide locked message
+            if (lockedMessage) lockedMessage.style.display = 'none';
+            
+            // Show and animate the unlock spell
+            if (unlockSpell) {
+                unlockSpell.style.display = 'block';
+                unlockSpell.style.opacity = '0';
+                
+                // Fade in spell text
+                setTimeout(() => {
+                    unlockSpell.style.opacity = '1';
+                }, 100);
+                
+                // After showing spell, fade it out and start footsteps
+                setTimeout(() => {
+                    unlockSpell.style.opacity = '0';
+                    setTimeout(() => {
+                        unlockSpell.style.display = 'none';
+                        // Show map and start animation
+                        if (mapImage) mapImage.style.filter = 'sepia(0.3) contrast(1.1)';
+                        startFootstepsAnimation();
+                    }, 1000);
+                }, 3000);
+            }
+        } else {
+            // Already unlocked, just show footsteps
+            if (lockedMessage) lockedMessage.style.display = 'none';
+            if (unlockSpell) unlockSpell.style.display = 'none';
+            startFootstepsAnimation();
+        }
+    } else {
+        // NOT ALL PUZZLES SOLVED - Show locked message
+        if (lockedMessage) {
+            lockedMessage.style.display = 'flex';
+            // Update counter
+            const counter = document.getElementById('puzzleCounter');
+            if (counter) counter.textContent = `${solvedCount}/7 Rätsel gelöst`;
+        }
+        if (unlockSpell) unlockSpell.style.display = 'none';
+        if (footstepsContainer) footstepsContainer.innerHTML = '';
+        if (footstepsLabel) footstepsLabel.style.opacity = '0';
+        // Dim the map
+        if (mapImage) mapImage.style.filter = 'sepia(0.5) contrast(0.8) brightness(0.6)';
     }
 }
 
@@ -38,6 +107,8 @@ function clearFootsteps() {
 
 function startFootstepsAnimation() {
     if (mapAnimationRunning) return;
+    if (!mapUnlocked) return; // Don't start if not unlocked
+    
     mapAnimationRunning = true;
     clearFootsteps();
     

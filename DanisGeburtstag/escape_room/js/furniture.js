@@ -121,8 +121,7 @@ function createBookshelves() {
     // Giant bookshelf on back wall (behind player spawn)
     createGiantBackBookshelf();
     
-    // Interactive book zones on back wall
-    createInteractiveBookZone(-4, 4, d/2 - 1, 'bookshelfLeft', CONFIG.interactives.bookshelfLeft);
+    // Interactive book zone on back wall (only right side now - whispering books)
     createInteractiveBookZone(4, 4, d/2 - 1, 'bookshelfRight', CONFIG.interactives.bookshelfRight);
     
     // Side wall shelves (left wall - not blocking fireplace)
@@ -130,7 +129,8 @@ function createBookshelves() {
     createBookshelf(-w/2 + 0.5, 0, 5, Math.PI/2, null, null, true);
     
     // Side wall shelves (right wall - alchemy area)
-    createBookshelf(w/2 - 0.5, 0, -4, -Math.PI/2, null, null, true);
+    // The first one (z=-4) is now interactive for book sorting game
+    createBookshelf(w/2 - 0.5, 0, -4, -Math.PI/2, 'bookshelfLeft', CONFIG.interactives.bookshelfLeft, false);
     createBookshelf(w/2 - 0.5, 0, 0, -Math.PI/2, null, null, true);
     createBookshelf(w/2 - 0.5, 0, 4, -Math.PI/2, null, null, true);
     
@@ -1233,26 +1233,19 @@ function createBells() {
 }
 
 function createStairs() {
-    // Stairs puzzle trigger is now attached to the main balcony stairs
-    // Create invisible interaction zone near the balcony stairs instead
+    // Stairs puzzle trigger - now hidden near the alchemy station
+    // It's a magical puzzle, doesn't need to be at actual stairs
+    const w = CONFIG.room.width;
+    
+    // Single trigger near the alchemy station on right wall
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 3, 2),
+        new THREE.BoxGeometry(2, 2, 2),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    interactZone.position.set(-4, 2, 4);  // Near left balcony stairs
+    interactZone.position.set(w/2 - 2, 1.5, -6);  // Near front right corner, by alchemy station
     interactZone.userData = { type: 'stairs', ...CONFIG.interactives.stairs };
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
-    
-    // Second trigger at right stairs
-    const interactZone2 = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 3, 2),
-        new THREE.MeshBasicMaterial({ visible: false })
-    );
-    interactZone2.position.set(4, 2, 4);  // Near right balcony stairs
-    interactZone2.userData = { type: 'stairs', ...CONFIG.interactives.stairs };
-    interactiveObjects.push(interactZone2);
-    scene.add(interactZone2);
 }
 
 function createMezzanine() {

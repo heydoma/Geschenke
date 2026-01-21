@@ -114,7 +114,7 @@ const CONFIG = {
         desk: { game: 3, hint: "Verschlüsselte Runen..." },
         potions: { game: 1, hint: "Seltsame Tränke..." },
         bells: { game: 6, hint: "Ein magisches Glockenspiel..." },
-        stairs: { game: 4, hint: "Die Treppen bewegen sich..." },
+        stairs: { game: 4, hint: "Magische Treppen-Schriften..." },
         pensieve: { game: 8, hint: "Das Denkarium...", hidden: true }
     }
 };
