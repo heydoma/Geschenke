@@ -25,25 +25,25 @@ function createFireplace() {
     
     // === COLUMNS (front/back along Z) ===
     [-1.6, 1.6].forEach(dz => {
-        const col = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.5, 0.6), marbleMat);
-        col.position.set(wallX + 0.5, 2.25, centerZ + dz);
+        const col = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.2, 0.6), marbleMat);
+        col.position.set(wallX + 0.5, 1.6, centerZ + dz);
         col.castShadow = true;
         scene.add(col);
         
         // Column cap
         const cap = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.25, 0.8), stoneMat);
-        cap.position.set(wallX + 0.5, 4.6, centerZ + dz);
+        cap.position.set(wallX + 0.5, 3.3, centerZ + dz);
         scene.add(cap);
         
         // Decorative ball
         const ball = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), goldMat);
-        ball.position.set(wallX + 0.5, 4.85, centerZ + dz);
+        ball.position.set(wallX + 0.5, 3.55, centerZ + dz);
         scene.add(ball);
     });
     
     // === MANTLE (spans columns, extends into room) ===
     const mantle = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 4), marbleMat);
-    mantle.position.set(wallX + 0.8, 4.5, centerZ);
+    mantle.position.set(wallX + 0.8, 3.2, centerZ);
     mantle.castShadow = true;
     scene.add(mantle);
     
@@ -83,21 +83,21 @@ function createFireplace() {
     [-1.0, 1.0].forEach(dz => {
         // Candle holder
         const holder = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.06, 8), goldMat);
-        holder.position.set(wallX + 1.0, 4.68, centerZ + dz);
+        holder.position.set(wallX + 1.0, 3.38, centerZ + dz);
         scene.add(holder);
         
         // Candle
         const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.15, 8),
             new THREE.MeshStandardMaterial({ color: 0xf5ead0 }));
-        candle.position.set(wallX + 1.0, 4.78, centerZ + dz);
+        candle.position.set(wallX + 1.0, 3.48, centerZ + dz);
         scene.add(candle);
         
         // Flame
         const flame = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.05, 6),
             new THREE.MeshBasicMaterial({ color: 0xffaa33 }));
-        flame.position.set(wallX + 1.0, 4.9, centerZ + dz);
+        flame.position.set(wallX + 1.0, 3.6, centerZ + dz);
         scene.add(flame);
-        floatingCandles.push({ mesh: flame, baseY: 4.9, phase: Math.random() * Math.PI * 2 });
+        floatingCandles.push({ mesh: flame, baseY: 3.6, phase: Math.random() * Math.PI * 2 });
     });
     
     // Collider (blocks walking into fireplace)
@@ -243,7 +243,7 @@ function createGiantBackBookshelf() {
 
 function createInteractiveBookZone(x, y, z, name, config) {
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(3, 4, 2),
+        new THREE.BoxGeometry(1.5, 2, 1),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(x, y, z);
@@ -320,10 +320,10 @@ function createBookshelf(x, y, z, rotY, name, config, decorative = false) {
     
     if (!decorative && name && config) {
         const interactZone = new THREE.Mesh(
-            new THREE.BoxGeometry(5, 8, 2),
+            new THREE.BoxGeometry(2, 4, 1.2),
             new THREE.MeshBasicMaterial({ visible: false })
         );
-        interactZone.position.set(x, 4, z + 0.8);
+        interactZone.position.set(x, 2, z + 0.8);
         interactZone.rotation.y = rotY;
         interactZone.userData = { type: name, ...config };
         interactiveObjects.push(interactZone);
@@ -537,7 +537,7 @@ function createRuneDesk() {
     
     // Interactive zone for rune puzzle
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 1.5, 1.5),
+        new THREE.BoxGeometry(1, 1, 1),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(x, 0.9, z);
@@ -559,137 +559,92 @@ let magicMapElements = {
 };
 
 function createMagicMap(x, y, z) {
-    // === PARCHMENT BASE ===
+    // === SIMPLE PARCHMENT MAP ===
+    // Clean, simple design - the detailed map is shown in the modal
+    
     const parchmentMat = new THREE.MeshStandardMaterial({ 
         color: 0xd4c4a8, 
-        roughness: 0.9,
+        roughness: 0.85,
         side: THREE.DoubleSide
     });
     
+    // Main parchment - slightly rolled edges effect
     const parchment = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.6, 0.45),
+        new THREE.PlaneGeometry(0.5, 0.35),
         parchmentMat
     );
     parchment.position.set(x, y + 0.005, z);
     parchment.rotation.x = -Math.PI / 2;
-    parchment.rotation.z = 0.08; // Slight angle
-    parchment.receiveShadow = true;
+    parchment.rotation.z = 0.05;
     scene.add(parchment);
     magicMapElements.parchment = parchment;
     
-    // Parchment edges (curled corners)
-    const edgeMat = new THREE.MeshStandardMaterial({ color: 0xc4b498, roughness: 0.85 });
-    [[-0.28, -0.2], [0.28, -0.2], [-0.28, 0.2], [0.28, 0.2]].forEach(([dx, dz]) => {
-        const curl = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.015, 0.015, 0.04, 8),
-            edgeMat
-        );
-        curl.position.set(x + dx, y + 0.015, z + dz);
-        curl.rotation.z = Math.PI / 2;
-        scene.add(curl);
-    });
-    
-    // === FADED BASE MAP (always visible but faint) ===
-    const fadedInkMat = new THREE.MeshBasicMaterial({ 
-        color: 0x8a7a5a, 
-        transparent: true, 
-        opacity: 0.15,
-        side: THREE.DoubleSide
-    });
-    
-    // Library outline (faded)
-    const libraryOutline = createMapLine([
-        [-0.22, -0.15], [-0.22, 0.15], [0.22, 0.15], [0.22, -0.15], [-0.22, -0.15]
-    ], x, y + 0.006, z, fadedInkMat);
-    scene.add(libraryOutline);
-    
-    // === PUZZLE PATH MARKERS (revealed as puzzles are solved) ===
-    const pathLineMat = new THREE.MeshBasicMaterial({
-        color: 0x2a1a0a,
-        transparent: true,
-        opacity: 0,  // Starts invisible
-        side: THREE.DoubleSide
-    });
-    
-    // 7 path segments corresponding to 7 puzzles
-    const pathSegments = [
-        // Puzzle 1: Polyjuice - from potions shelf area
-        { from: [0.18, 0.08], to: [0.1, 0.02], symbol: '🧪', angle: 0.3 },
-        // Puzzle 2: Whispering Books - from bookshelf
-        { from: [-0.15, 0.12], to: [-0.05, 0.06], symbol: '📖', angle: -0.2 },
-        // Puzzle 3: Cipher - from desk
-        { from: [0, -0.05], to: [0, 0.02], symbol: '🔐', angle: 0 },
-        // Puzzle 4: Staircase - from stairs
-        { from: [0.2, -0.08], to: [0.12, -0.02], symbol: '🪜', angle: 0.4 },
-        // Puzzle 5: Invisible Ink - from fireplace area
-        { from: [-0.2, -0.08], to: [-0.1, -0.02], symbol: '🕯️', angle: -0.3 },
-        // Puzzle 6: Bells - above fireplace
-        { from: [-0.2, 0.0], to: [-0.08, 0.02], symbol: '🔔', angle: -0.15 },
-        // Puzzle 7: Book Sort - from back bookshelf
-        { from: [0, 0.15], to: [0, 0.08], symbol: '📚', angle: 0.1 }
-    ];
-    
-    pathSegments.forEach((seg, index) => {
-        // Create path line (initially invisible)
-        const lineMat = pathLineMat.clone();
-        const line = createMapLine([seg.from, seg.to], x, y + 0.007, z, lineMat);
-        line.visible = false;
-        scene.add(line);
-        magicMapElements.pathLines.push({ mesh: line, material: lineMat, puzzleIndex: index + 1 });
-        
-        // Create symbol marker (initially invisible)
-        const symbolGroup = createMapSymbol(x + seg.from[0], y + 0.008, z + seg.from[1], seg.symbol, seg.angle);
-        symbolGroup.visible = false;
-        scene.add(symbolGroup);
-        magicMapElements.symbols.push({ group: symbolGroup, puzzleIndex: index + 1 });
-    });
-    
-    // === FINAL PATH (revealed when all 7 puzzles solved) ===
-    const finalPathMat = new THREE.MeshBasicMaterial({
-        color: 0xc9a227,
-        transparent: true,
-        opacity: 0,
-        side: THREE.DoubleSide
-    });
-    
-    // Golden path leading to center/secret
-    const finalPath = createMapLine([
-        [0.1, 0.02], [0.05, 0], [0, 0], [-0.05, 0], [-0.08, 0.02],
-        [0, 0.04], [0.08, 0.02], [0, 0] // Converging to center
-    ], x, y + 0.008, z, finalPathMat);
-    finalPath.visible = false;
-    scene.add(finalPath);
-    magicMapElements.finalPath = { mesh: finalPath, material: finalPathMat };
-    
-    // Subtle glow light for the map (intensifies as puzzles solved)
-    const mapGlow = new THREE.PointLight(0xc9a227, 0, 1);
-    mapGlow.position.set(x, y + 0.2, z);
-    scene.add(mapGlow);
-    magicMapElements.glowLight = mapGlow;
-    
-    // === DECORATIVE ELEMENTS (always visible) ===
-    // Compass rose in corner
-    createCompassRose(x + 0.22, y + 0.007, z - 0.15);
-    
-    // Title text simulation (just a decorative line)
-    const titleLine = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.25, 0.015),
-        new THREE.MeshBasicMaterial({ color: 0x3a2a1a, transparent: true, opacity: 0.6 })
+    // Rolled edge on left side
+    const rollMat = new THREE.MeshStandardMaterial({ color: 0xc4b498, roughness: 0.8 });
+    const leftRoll = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.02, 0.02, 0.36, 8),
+        rollMat
     );
-    titleLine.position.set(x, y + 0.006, z + 0.18);
-    titleLine.rotation.x = -Math.PI / 2;
-    scene.add(titleLine);
+    leftRoll.position.set(x - 0.26, y + 0.015, z);
+    leftRoll.rotation.x = Math.PI / 2;
+    scene.add(leftRoll);
+    
+    // Rolled edge on right side (smaller, partially unrolled)
+    const rightRoll = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.015, 0.015, 0.36, 8),
+        rollMat
+    );
+    rightRoll.position.set(x + 0.26, y + 0.012, z);
+    rightRoll.rotation.x = Math.PI / 2;
+    scene.add(rightRoll);
+    
+    // Simple ink lines to suggest a floor plan
+    const inkMat = new THREE.MeshBasicMaterial({ 
+        color: 0x3a2a1a, 
+        transparent: true, 
+        opacity: 0.5 
+    });
+    
+    // Outer rectangle (simple room outline)
+    const outline = new THREE.Mesh(
+        new THREE.RingGeometry(0.12, 0.13, 4),
+        inkMat
+    );
+    outline.position.set(x, y + 0.006, z);
+    outline.rotation.x = -Math.PI / 2;
+    outline.rotation.z = Math.PI / 4;
+    scene.add(outline);
+    
+    // A few subtle lines
+    [-0.08, 0, 0.08].forEach(dz => {
+        const line = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.2, 0.004),
+            inkMat
+        );
+        line.position.set(x, y + 0.006, z + dz);
+        line.rotation.x = -Math.PI / 2;
+        scene.add(line);
+    });
+    
+    // Title area (decorative squiggle)
+    const title = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.15, 0.02),
+        new THREE.MeshBasicMaterial({ color: 0x4a3a2a, transparent: true, opacity: 0.4 })
+    );
+    title.position.set(x, y + 0.006, z + 0.13);
+    title.rotation.x = -Math.PI / 2;
+    scene.add(title);
     
     // Interactive zone for the map
     const mapInteract = new THREE.Mesh(
-        new THREE.BoxGeometry(0.7, 0.3, 0.5),
+        new THREE.BoxGeometry(0.4, 0.25, 0.35),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     mapInteract.position.set(x, y + 0.15, z);
     mapInteract.userData = { 
         type: 'magicMap', 
-        hint: 'Die Karte der Verborgenen Wege betrachten',
-        game: null // Not a minigame, just shows progress
+        hint: 'Die Karte des Rumtreibers betrachten',
+        game: null
     };
     interactiveObjects.push(mapInteract);
     scene.add(mapInteract);
@@ -893,7 +848,7 @@ function createMagicOrb() {
     
     // Interactive zone
     const interactZone = new THREE.Mesh(
-        new THREE.SphereGeometry(0.5, 8, 8),
+        new THREE.SphereGeometry(0.35, 8, 8),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(x, y + 0.27, z);
@@ -1151,7 +1106,7 @@ function createAlchemyStation() {
     
     // === INTERACTIVE ZONE ===
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(3, 2, 2),
+        new THREE.BoxGeometry(1.5, 1.5, 1.2),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(baseX, 1.2, baseZ);
@@ -1201,7 +1156,7 @@ function createCauldronSteam(x, y, z) {
 function createBells() {
     // Position under fireplace mantle (left wall, inside fireplace area)
     const w = CONFIG.room.width;
-    const x = -w/2 + 1.8, y = 3.8, z = 0;  // Under mantle, rotated to face into room
+    const x = -w/2 + 1.8, y = 2.6, z = 0;  // Under mantle, rotated to face into room
     
     const bellSizes = [0.08, 0.1, 0.12, 0.1, 0.08];
     const bellMat = new THREE.MeshStandardMaterial({ color: 0xd4a855, metalness: 0.7, roughness: 0.25 });
@@ -1223,7 +1178,7 @@ function createBells() {
     });
     
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, 0.8, 1.5),
+        new THREE.BoxGeometry(0.3, 0.6, 0.8),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(x, y, z);
@@ -1294,7 +1249,7 @@ function createStairs() {
     
     // Interactive trigger zone
     const interactZone = new THREE.Mesh(
-        new THREE.BoxGeometry(1.5, 2, 1.5),
+        new THREE.BoxGeometry(0.8, 1.2, 0.8),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     interactZone.position.set(x, y, z);
@@ -1429,17 +1384,14 @@ function createEntranceBalcony(mezzMat, railMat) {
 
 function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
     // Staircase going DOWN from balcony (high at startZ, low at startZ - totalDepth)
-    // Visual: individual steps. Mechanical: ramp collider for smooth walking
+    // Visual: individual steps. Mechanical: single smooth ramp collider
     const stepCount = 10;
     const stepHeight = startY / stepCount;
     const stepDepth = 0.4;
     const stepWidth = 1.6;
     const totalDepth = stepCount * stepDepth;
     
-    // Railing on OUTSIDE (away from room center)
-    const railSide = startX < 0 ? -stepWidth/2 - 0.1 : stepWidth/2 + 0.1;
-    
-    // Create VISUAL steps only (no individual colliders)
+    // Create VISUAL steps only
     for (let i = 0; i < stepCount; i++) {
         const stepY = startY - (i + 1) * stepHeight;
         const stepZ = startZ - i * stepDepth - stepDepth/2;
@@ -1454,46 +1406,71 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
         scene.add(step);
     }
     
-    // Create RAMP COLLIDERS - many thin walkable surfaces forming a slope
-    // More segments = smoother walking
-    const rampSegments = 30;
-    const segmentDepth = totalDepth / rampSegments;
-    for (let i = 0; i <= rampSegments; i++) {
+    // Create SMOOTH RAMP COLLIDER - one continuous slope
+    // Stop before ground level to prevent sticking in floor
+    const rampSegments = 40;
+    for (let i = 0; i < rampSegments; i++) {
         const t = i / rampSegments;
-        const segY = startY * (1 - t);  // Height decreases from startY to 0
-        const segZ = startZ - t * totalDepth;
-        // Each segment is a thin platform the player can stand on
-        addCollider(startX, segY, segZ, stepWidth, 0.15, segmentDepth + 0.05);
+        const nextT = (i + 1) / rampSegments;
+        const midT = (t + nextT) / 2;
+        const segY = startY * (1 - midT);
+        
+        // Skip the last few segments near ground level
+        if (segY < 0.2) continue;
+        
+        const segZ = startZ - midT * totalDepth;
+        const segmentDepth = totalDepth / rampSegments;
+        addCollider(startX, segY, segZ, stepWidth, 0.08, segmentDepth + 0.1);
     }
     
-    // Railing posts along the stairs (on outside edge)
-    for (let i = 0; i <= stepCount; i += 2) {
-        const postY = startY - i * stepHeight;
-        const postZ = startZ - i * stepDepth;
+    // === RAILINGS ON BOTH SIDES ===
+    const railHeight = 1.1;
+    const railOffset = stepWidth / 2 + 0.06;
+    
+    [-1, 1].forEach(side => {
+        const xOffset = side * railOffset;
         
-        const post = new THREE.Mesh(
-            new THREE.BoxGeometry(0.08, 0.9, 0.08),
+        // Railing posts at each step
+        for (let i = 0; i <= stepCount; i++) {
+            const postY = startY - i * stepHeight;
+            const postZ = startZ - i * stepDepth;
+            
+            // Skip bottom post (at ground level)
+            if (postY < 0.1) continue;
+            
+            const post = new THREE.Mesh(
+                new THREE.BoxGeometry(0.08, railHeight, 0.08),
+                railMat
+            );
+            post.position.set(startX + xOffset, postY + railHeight / 2, postZ);
+            scene.add(post);
+        }
+        
+        // Handrail following the slope
+        const railLength = Math.sqrt(totalDepth * totalDepth + startY * startY);
+        const railAngle = -Math.atan2(startY, totalDepth);
+        
+        const handrail = new THREE.Mesh(
+            new THREE.BoxGeometry(0.08, 0.08, railLength),
             railMat
         );
-        post.position.set(startX + railSide, postY + 0.45, postZ);
-        scene.add(post);
-    }
-    
-    // Handrail following the slope
-    const railLength = Math.sqrt(totalDepth * totalDepth + startY * startY);
-    const railAngle = -Math.atan2(startY, totalDepth);
-    
-    const handrail = new THREE.Mesh(
-        new THREE.BoxGeometry(0.06, 0.06, railLength),
-        railMat
-    );
-    handrail.position.set(
-        startX + railSide,
-        startY / 2 + 0.45,
-        startZ - totalDepth / 2
-    );
-    handrail.rotation.x = railAngle;
-    scene.add(handrail);
+        handrail.position.set(
+            startX + xOffset,
+            startY / 2 + railHeight,
+            startZ - totalDepth / 2
+        );
+        handrail.rotation.x = railAngle;
+        scene.add(handrail);
+        
+        // Collision walls - skip near ground
+        for (let i = 0; i < rampSegments; i++) {
+            const t = (i + 0.5) / rampSegments;
+            const wallY = startY * (1 - t);
+            if (wallY < 0.3) continue;  // Skip near ground
+            const wallZ = startZ - t * totalDepth;
+            addCollider(startX + xOffset, wallY + 0.5, wallZ, 0.15, 1.2, totalDepth / rampSegments + 0.1);
+        }
+    });
 }
 
 // ============================================================================
@@ -1829,11 +1806,13 @@ function createFloatingCandles() {
     // One central chandelier
     createGrandChandelier(0, 8, -1);
     
-    // Wall sconces (reduced from 6 to 4)
-    createWallSconce(-8.5, 3, -1, Math.PI/2);
-    createWallSconce(8.5, 3, -1, -Math.PI/2);
-    createWallSconce(-4, 3, -6.8, 0);
-    createWallSconce(4, 3, -6.8, 0);
+    // Wall sconces directly on walls (adjusted positions)
+    const w = CONFIG.room.width;
+    const d = CONFIG.room.depth;
+    createWallSconce(-w/2 + 0.15, 3, -1, Math.PI/2);   // Left wall
+    createWallSconce(w/2 - 0.15, 3, -1, -Math.PI/2);   // Right wall
+    createWallSconce(-4, 3, -d/2 + 0.15, 0);           // Front wall left
+    createWallSconce(4, 3, -d/2 + 0.15, 0);            // Front wall right
     
     // One magical candle near orb
     createMagicalCandle(0.5, 2.5, -2.5);

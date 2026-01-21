@@ -20,13 +20,14 @@ function getFloorHeight(x, z) {
             const boxHeight = box.max.y - box.min.y;
             
             // Only consider thin surfaces as walkable floors (not walls)
-            if (boxHeight > 0.5) continue;
+            // Increased threshold for ramp segments
+            if (boxHeight > 0.6) continue;
             
             // Accept any surface that is:
-            // - At or below current feet + step height (can step up to)
+            // - Within step height range of current feet (smooth ramp walking)
             // - Higher than previously found floor (find the highest valid one)
-            // This allows stepping DOWN onto lower surfaces AND stepping UP
-            if (surfaceY <= playerFeet + stepUp + 0.5 && surfaceY > floorY) {
+            // More generous tolerance for smooth ramp transitions
+            if (surfaceY <= playerFeet + stepUp + 0.8 && surfaceY > floorY) {
                 floorY = surfaceY;
             }
         }
@@ -49,8 +50,9 @@ function checkCollision(newPos) {
         if (newPos.x > minX && newPos.x < maxX && newPos.z > minZ && newPos.z < maxZ) {
             const boxHeight = box.max.y - box.min.y;
             
-            // If this is a thin surface (floor/stair) that we can stand ON, don't block
-            if (boxHeight < 0.5 && Math.abs(box.max.y - feetY) < CONFIG.player.stepHeight) {
+            // If this is a thin surface (floor/ramp segment) that we can stand ON, don't block
+            // Increased threshold for ramp segments
+            if (boxHeight < 0.6 && Math.abs(box.max.y - feetY) < CONFIG.player.stepHeight + 0.3) {
                 continue;  // This is a walkable surface, not a wall
             }
             
