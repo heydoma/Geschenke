@@ -99,6 +99,7 @@ function init() {
     createStairs();
     createMezzanine();
     createProps();
+    createReadingNook(); // Add the new reading nook and trigger for game 5
     createDustParticles();
     // Floor fog removed (didn't look good)
     createFloatingCandles();

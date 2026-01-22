@@ -1,4 +1,125 @@
 // ============================================================================
+// READING NOOK BETWEEN STAIRS (Game 5 trigger)
+// ============================================================================
+function createReadingNook() {
+    // Position - weiter links und weiter hinten
+    const nookX = -2;  // Weiter nach links (war 0)
+    const nookY = 0;
+    const nookZ = 6.5;   // Weiter nach hinten (war 4.7)
+
+    // Größerer Bücherwagen - professionelle Bibliothekswagen-Proportionen
+    const cartWidth = 1.8;      // Breiter
+    const cartHeight = 0.95;    // Höher
+    const cartDepth = 0.7;      // Tiefer
+    const wheelRadius = 0.12;   // Größere Räder
+    
+    const cartMat = new THREE.MeshStandardMaterial({ 
+        color: 0x8b7355, 
+        roughness: 0.6,
+        metalness: 0.1 
+    });
+    
+    // Dickere Seitenwände
+    const sideThickness = 0.06;
+    for (let i = -1; i <= 1; i += 2) {
+        const side = new THREE.Mesh(
+            new THREE.BoxGeometry(sideThickness, cartHeight, cartDepth), 
+            cartMat
+        );
+        side.position.set(
+            nookX + i * (cartWidth/2 - sideThickness/2), 
+            nookY + cartHeight/2 + wheelRadius, 
+            nookZ
+        );
+        scene.add(side);
+    }
+    
+    // Drei Regalböden (mehr Platz für Bücher)
+    const shelfThickness = 0.04;
+    for (let shelfY of [0.25, 0.52, 0.79]) {
+        const shelf = new THREE.Mesh(
+            new THREE.BoxGeometry(cartWidth - sideThickness*2, shelfThickness, cartDepth - 0.06), 
+            cartMat
+        );
+        shelf.position.set(nookX, nookY + shelfY + wheelRadius, nookZ);
+        scene.add(shelf);
+    }
+    
+    // Rückwand (jetzt auf der anderen Seite)
+    const backThickness = 0.03;
+    const back = new THREE.Mesh(
+        new THREE.BoxGeometry(cartWidth - sideThickness*2, cartHeight, backThickness), 
+        cartMat
+    );
+    back.position.set(
+        nookX, 
+        nookY + cartHeight/2 + wheelRadius, 
+        nookZ + cartDepth/2 - backThickness/2
+    );
+    scene.add(back);
+    
+    // Obere Kante/Griff (jetzt vorne)
+    const handleBar = new THREE.Mesh(
+        new THREE.BoxGeometry(cartWidth, 0.08, 0.08),
+        new THREE.MeshStandardMaterial({ color: 0x6b5345, roughness: 0.5 })
+    );
+    handleBar.position.set(nookX, nookY + cartHeight + wheelRadius + 0.04, nookZ - cartDepth/2 + 0.04);
+    scene.add(handleBar);
+    
+    // Größere Räder - WEITER NACH AUSSEN
+    const wheelMat = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a, 
+        roughness: 0.8,
+        metalness: 0.2 
+    });
+    const wheelPositions = [
+        [-0.85, -0.30], [-0.85, 0.30],
+        [0.85, -0.30], [0.85, 0.30]
+    ];
+    
+    for (let [xOffset, zOffset] of wheelPositions) {
+        const wheel = new THREE.Mesh(
+            new THREE.CylinderGeometry(wheelRadius, wheelRadius, 0.06, 16), 
+            wheelMat
+        );
+        wheel.position.set(nookX + xOffset, nookY + wheelRadius, nookZ + zOffset);
+        wheel.rotation.z = Math.PI / 2;
+        scene.add(wheel);
+        
+        // Radachse für Realismus
+        const axle = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.02, 0.02, 0.1, 8),
+            new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 })
+        );
+        axle.position.copy(wheel.position);
+        axle.rotation.copy(wheel.rotation);
+        scene.add(axle);
+    }
+    
+    // KOLLISION - Verhindert Durchlaufen
+    addCollider(nookX, nookY + (cartHeight + wheelRadius)/2, nookZ, cartWidth, cartHeight + wheelRadius, cartDepth);
+    
+    // Mehr Bücher auf allen drei Ebenen
+    for (let shelfY of [0.28, 0.55, 0.82]) {
+        createBookStack(nookX - 0.4, nookY + shelfY + wheelRadius, nookZ, 8, 0.16);
+        createBookStack(nookX + 0.4, nookY + shelfY + wheelRadius, nookZ, 7, 0.16);
+    }
+
+    // Größere Trigger-Box
+    const triggerBox = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 0.3, 0.5),
+        new THREE.MeshBasicMaterial({ visible: false })
+    );
+    triggerBox.position.set(nookX, nookY + 0.5, nookZ);
+    triggerBox.userData = {
+        type: 'game7',
+        hint: 'Sortiere die Bücher in die richtige Reihenfolge!',
+        game: 7
+    };
+    interactiveObjects.push(triggerBox);
+    scene.add(triggerBox);
+}
+// ============================================================================
 // ESCAPE ROOM - FURNITURE
 // Die Verbotene Abteilung - Fireplace, Bookshelves, Desk, Props
 // ============================================================================
@@ -9,9 +130,9 @@
 function createFireplace() {
     // Position: against left wall, facing +X (into room)
     const w = CONFIG.room.width;
-    const wallX = -w/2;      // Left wall position
+    const wallX = -w / 2;      // Left wall position
     const centerZ = 0;       // Center of room
-    
+
     // Materials
     const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6a625a, roughness: 0.8 });
     const darkStoneMat = new THREE.MeshStandardMaterial({ color: 0x3a3530, roughness: 0.9 });
@@ -19,56 +140,56 @@ function createFireplace() {
     const brickMat = new THREE.MeshStandardMaterial({ color: 0x6a3a2a, roughness: 0.85 });
     const darkMat = new THREE.MeshBasicMaterial({ color: 0x020202 });
     const goldMat = new THREE.MeshStandardMaterial({ color: 0xc9a227, metalness: 0.7, roughness: 0.3 });
-    
+
     // Build fireplace in a group, then position it
     // Fireplace opens toward +X (depth along X, width along Z)
-    
+
     // === COLUMNS (front/back along Z) ===
     [-1.6, 1.6].forEach(dz => {
         const col = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.2, 0.6), marbleMat);
         col.position.set(wallX + 0.5, 1.6, centerZ + dz);
         col.castShadow = true;
         scene.add(col);
-        
+
         // Column cap
         const cap = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.25, 0.8), stoneMat);
         cap.position.set(wallX + 0.5, 3.3, centerZ + dz);
         scene.add(cap);
-        
+
         // Decorative ball
         const ball = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), goldMat);
         ball.position.set(wallX + 0.5, 3.55, centerZ + dz);
         scene.add(ball);
     });
-    
+
     // === MANTLE (spans columns, extends into room) ===
     const mantle = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 4), marbleMat);
     mantle.position.set(wallX + 0.8, 3.2, centerZ);
     mantle.castShadow = true;
     scene.add(mantle);
-    
+
     // === BACK WALL (against room wall) ===
     const backWall = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 3.2), darkStoneMat);
     backWall.position.set(wallX + 0.15, 2, centerZ);
     scene.add(backWall);
-    
+
     // === FIRE OPENING (dark recess) ===
     const opening = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2.5, 2.2), darkMat);
     opening.position.set(wallX + 0.5, 1.35, centerZ);
     scene.add(opening);
-    
+
     // === HEARTH (floor in front of fireplace) ===
     const hearth = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.1, 4), darkStoneMat);
     hearth.position.set(wallX + 1.5, 0.05, centerZ);
     hearth.receiveShadow = true;
     scene.add(hearth);
-    
+
     // === FIRE GRATE ===
     const grateMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.6, roughness: 0.4 });
     const grateBase = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.05, 1.4), grateMat);
     grateBase.position.set(wallX + 0.7, 0.15, centerZ);
     scene.add(grateBase);
-    
+
     // === LOGS ===
     const logMat = new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.95 });
     [[0, -0.3], [0, 0.3], [0.15, 0]].forEach(([dx, dz]) => {
@@ -78,20 +199,20 @@ function createFireplace() {
         log.rotation.z = (Math.random() - 0.5) * 0.3;
         scene.add(log);
     });
-    
+
     // === MANTLE DECORATIONS ===
     [-1.0, 1.0].forEach(dz => {
         // Candle holder
         const holder = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.06, 8), goldMat);
         holder.position.set(wallX + 1.0, 3.38, centerZ + dz);
         scene.add(holder);
-        
+
         // Candle
         const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.15, 8),
             new THREE.MeshStandardMaterial({ color: 0xf5ead0 }));
         candle.position.set(wallX + 1.0, 3.48, centerZ + dz);
         scene.add(candle);
-        
+
         // Flame
         const flame = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.05, 6),
             new THREE.MeshBasicMaterial({ color: 0xffaa33 }));
@@ -99,14 +220,14 @@ function createFireplace() {
         scene.add(flame);
         floatingCandles.push({ mesh: flame, baseY: 3.6, phase: Math.random() * Math.PI * 2 });
     });
-    
+
     // Collider (blocks walking into fireplace)
     addCollider(wallX + 0.5, 2, centerZ, 1.5, 4, 4);
-    
+
     // Fire particles
     createFireParticles(wallX + 0.7, centerZ);
     createEmberParticles(wallX + 0.7, centerZ);
-    
+
     // Fireplace interactive zone removed - bells are under the mantle now
 }
 
@@ -117,22 +238,20 @@ function createBookshelves() {
     const w = CONFIG.room.width;
     const h = CONFIG.room.height;
     const d = CONFIG.room.depth;
-    
+
     // Giant bookshelf on back wall (behind player spawn)
     createGiantBackBookshelf();
-    
-    // Interactive book zone on back wall (only right side now - whispering books)
-    createInteractiveBookZone(4, 4, d/2 - 1, 'bookshelfRight', CONFIG.interactives.bookshelfRight);
-    
+
+
     // Side wall shelves (left wall - not blocking fireplace)
-    createBookshelf(-w/2 + 0.5, 0, -d/2 + 3, Math.PI/2, null, null, true);
-    createBookshelf(-w/2 + 0.5, 0, 5, Math.PI/2, null, null, true);
-    
+    createBookshelf(-w / 2 + 0.5, 0, -d / 2 + 3, Math.PI / 2, null, null, true);
+    createBookshelf(-w / 2 + 0.5, 0, 5, Math.PI / 2, null, null, true);
+
     // Side wall shelves (right wall - alchemy area) - all decorative now
-    createBookshelf(w/2 - 0.5, 0, -4, -Math.PI/2, null, null, true);
-    createBookshelf(w/2 - 0.5, 0, 0, -Math.PI/2, null, null, true);
-    createBookshelf(w/2 - 0.5, 0, 4, -Math.PI/2, null, null, true);
-    
+    createBookshelf(w / 2 - 0.5, 0, -4, -Math.PI / 2, null, null, true);
+    createBookshelf(w / 2 - 0.5, 0, 0, -Math.PI / 2, null, null, true);
+    createBookshelf(w / 2 - 0.5, 0, 4, -Math.PI / 2, null, null, true);
+
     // No more instanced books - books are built into shelves now
 }
 
@@ -140,17 +259,17 @@ function createGiantBackBookshelf() {
     const w = CONFIG.room.width;
     const h = CONFIG.room.height;
     const d = CONFIG.room.depth;
-    
+
     const shelfWidth = w - 4;  // Almost full width
     const shelfHeight = h - 1; // Almost full height
     const shelfDepth = 1.0;
     const x = 0;
-    const z = d/2 - 0.5;  // Against back wall
-    
+    const z = d / 2 - 0.5;  // Against back wall
+
     const frameMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodDark, roughness: 0.7 });
     const shelfMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
     const accentMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.5 });
-    
+
     // Book colors for variety
     const bookColors = [
         0x8b4513, 0x654321, 0x4a2511, // Browns
@@ -159,85 +278,85 @@ function createGiantBackBookshelf() {
         0x1c2e4a, 0x0c1e3a, 0x2c3e5a, // Blues
         0x4a3a1c, 0x5a4a2c, 0x3a2a0c, // Tan
     ];
-    
+
     // Main back panel - against the WALL (high z value)
     const backPanel = new THREE.Mesh(new THREE.BoxGeometry(shelfWidth, shelfHeight, 0.15), frameMat);
-    backPanel.position.set(x, shelfHeight/2, z + shelfDepth/2 - 0.1);
+    backPanel.position.set(x, shelfHeight / 2, z + shelfDepth / 2 - 0.1);
     backPanel.receiveShadow = true;
     scene.add(backPanel);
-    
+
     // Vertical dividers
     const dividerCount = Math.floor(shelfWidth / 3);
     const sectionWidth = shelfWidth / dividerCount;
-    
+
     for (let i = 0; i <= dividerCount; i++) {
-        const dx = -shelfWidth/2 + sectionWidth * i;
+        const dx = -shelfWidth / 2 + sectionWidth * i;
         const divider = new THREE.Mesh(new THREE.BoxGeometry(0.14, shelfHeight, shelfDepth), shelfMat);
-        divider.position.set(x + dx, shelfHeight/2, z);
+        divider.position.set(x + dx, shelfHeight / 2, z);
         divider.castShadow = true;
         scene.add(divider);
     }
-    
+
     // Side frames (thicker)
-    [-shelfWidth/2, shelfWidth/2].forEach(dx => {
+    [-shelfWidth / 2, shelfWidth / 2].forEach(dx => {
         const side = new THREE.Mesh(new THREE.BoxGeometry(0.25, shelfHeight, shelfDepth + 0.15), frameMat);
-        side.position.set(x + dx, shelfHeight/2, z);
+        side.position.set(x + dx, shelfHeight / 2, z);
         side.castShadow = true;
         scene.add(side);
     });
-    
+
     // Horizontal shelves WITH book rows
     const shelfSpacing = 1.1;
-    
+
     for (let sy = 0.6; sy <= shelfHeight - 0.5; sy += shelfSpacing) {
         // Shelf board
         const shelf = new THREE.Mesh(new THREE.BoxGeometry(shelfWidth - 0.3, 0.08, shelfDepth - 0.1), shelfMat);
         shelf.position.set(x, sy, z);
         shelf.receiveShadow = true;
         scene.add(shelf);
-        
+
         // Book rows for each section between dividers
         for (let sec = 0; sec < dividerCount; sec++) {
-            const secX = -shelfWidth/2 + sectionWidth * sec + sectionWidth/2;
-            
+            const secX = -shelfWidth / 2 + sectionWidth * sec + sectionWidth / 2;
+
             // Create 3-5 book "blocks" per section with varied colors
             const bookCount = 3 + Math.floor(Math.random() * 3);
             const bookBlockWidth = (sectionWidth - 0.3) / bookCount;
-            
+
             for (let b = 0; b < bookCount; b++) {
-                const bx = secX - (sectionWidth - 0.3)/2 + bookBlockWidth * b + bookBlockWidth/2;
+                const bx = secX - (sectionWidth - 0.3) / 2 + bookBlockWidth * b + bookBlockWidth / 2;
                 const bookHeight = 0.6 + Math.random() * 0.35;  // Taller books
                 const bookColor = bookColors[Math.floor(Math.random() * bookColors.length)];
-                
+
                 const bookBlock = new THREE.Mesh(
                     new THREE.BoxGeometry(bookBlockWidth - 0.02, bookHeight, 0.5),
                     new THREE.MeshStandardMaterial({ color: bookColor, roughness: 0.8 })
                 );
                 // Position books at FRONT of shelf (towards player = lower z values)
                 // Shelf is centered at z, books go at z - shelfDepth/2 + some offset to be visible
-                bookBlock.position.set(x + bx, sy + 0.04 + bookHeight/2, z - shelfDepth/2 + 0.5);
+                bookBlock.position.set(x + bx, sy + 0.04 + bookHeight / 2, z - shelfDepth / 2 + 0.5);
                 bookBlock.castShadow = true;
                 bookBlock.receiveShadow = true;
                 scene.add(bookBlock);
             }
         }
     }
-    
+
     // Crown molding (ornate top)
     const crown = new THREE.Mesh(new THREE.BoxGeometry(shelfWidth + 0.4, 0.3, shelfDepth + 0.25), accentMat);
     crown.position.set(x, shelfHeight + 0.15, z);
     scene.add(crown);
-    
+
     const crownDetail = new THREE.Mesh(new THREE.BoxGeometry(shelfWidth + 0.2, 0.15, 0.2), accentMat);
-    crownDetail.position.set(x, shelfHeight + 0.35, z + shelfDepth/2);
+    crownDetail.position.set(x, shelfHeight + 0.35, z + shelfDepth / 2);
     scene.add(crownDetail);
-    
+
     // Base molding
     const base = new THREE.Mesh(new THREE.BoxGeometry(shelfWidth + 0.3, 0.2, shelfDepth + 0.2), accentMat);
     base.position.set(x, 0.1, z);
     scene.add(base);
-    
-    addCollider(x, shelfHeight/2, z, shelfWidth + 0.3, shelfHeight, shelfDepth + 0.4);
+
+    addCollider(x, shelfHeight / 2, z, shelfWidth + 0.3, shelfHeight, shelfDepth + 0.4);
 }
 
 function createInteractiveBookZone(x, y, z, name, config) {
@@ -255,68 +374,68 @@ function createBookshelf(x, y, z, rotY, name, config, decorative = false) {
     const group = new THREE.Group();
     group.position.set(x, y, z);
     group.rotation.y = rotY;
-    
+
     const frameMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodDark, roughness: 0.7 });
     const shelfMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
-    
+
     // Book colors
     const bookColors = [
         0x8b4513, 0x654321, 0x4a2511, 0x2e4a1c, 0x1e3a0c,
         0x4a1c2e, 0x5a2c3e, 0x1c2e4a, 0x4a3a1c, 0x3a3a3a
     ];
-    
+
     const frame = new THREE.Mesh(new THREE.BoxGeometry(4.5, 8, 0.9), frameMat);
     frame.position.y = 4;
     frame.castShadow = true;
     frame.receiveShadow = true;
     group.add(frame);
-    
+
     const crown = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.2, 1), shelfMat);
     crown.position.set(0, 8, 0);
     group.add(crown);
-    
+
     // Shelves with integrated book rows
     for (let sy = 0.8; sy <= 7.2; sy += 1.1) {
         const shelf = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.08, 0.75), shelfMat);
         shelf.position.set(0, sy, 0.1);
         shelf.receiveShadow = true;
         group.add(shelf);
-        
+
         // Add book blocks on each shelf
         const bookCount = 4 + Math.floor(Math.random() * 3);
         const totalWidth = 3.8;
         const bookWidth = totalWidth / bookCount;
-        
+
         for (let b = 0; b < bookCount; b++) {
-            const bx = -totalWidth/2 + bookWidth * b + bookWidth/2;
+            const bx = -totalWidth / 2 + bookWidth * b + bookWidth / 2;
             const bookHeight = 0.5 + Math.random() * 0.4;
             const bookColor = bookColors[Math.floor(Math.random() * bookColors.length)];
-            
+
             const bookBlock = new THREE.Mesh(
                 new THREE.BoxGeometry(bookWidth - 0.03, bookHeight, 0.5),
                 new THREE.MeshStandardMaterial({ color: bookColor, roughness: 0.8 })
             );
-            bookBlock.position.set(bx, sy + 0.04 + bookHeight/2, 0.25);
+            bookBlock.position.set(bx, sy + 0.04 + bookHeight / 2, 0.25);
             bookBlock.castShadow = true;
             group.add(bookBlock);
         }
     }
-    
+
     const pillarGeo = new THREE.BoxGeometry(0.15, 8, 0.1);
     [-2.15, 2.15].forEach(px => {
         const pillar = new THREE.Mesh(pillarGeo, shelfMat);
         pillar.position.set(px, 4, 0.45);
         group.add(pillar);
     });
-    
+
     scene.add(group);
-    
-    if (rotY === Math.PI/2 || rotY === -Math.PI/2) {
+
+    if (rotY === Math.PI / 2 || rotY === -Math.PI / 2) {
         addCollider(x, 4, z, 1, 8, 4.5);
     } else {
         addCollider(x, 4, z, 4.5, 8, 1);
     }
-    
+
     if (!decorative && name && config) {
         const interactZone = new THREE.Mesh(
             new THREE.BoxGeometry(2, 4, 1.2),
@@ -343,14 +462,14 @@ function createDesk() {
     const x = 0, y = 0, z = -3;
     const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.5 });
     const darkWoodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
-    
+
     // Desk top
     const top = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.12, 1.8), woodMat);
     top.position.set(x, 0.9, z);
     top.castShadow = true;
     top.receiveShadow = true;
     scene.add(top);
-    
+
     // Drawers
     const drawerGeo = new THREE.BoxGeometry(0.8, 0.6, 1.5);
     [-1.2, 1.2].forEach(dx => {
@@ -358,7 +477,7 @@ function createDesk() {
         drawer.position.set(x + dx, 0.5, z);
         drawer.castShadow = true;
         scene.add(drawer);
-        
+
         const handle = new THREE.Mesh(
             new THREE.BoxGeometry(0.15, 0.04, 0.04),
             new THREE.MeshStandardMaterial({ color: 0x8b7355, metalness: 0.4 })
@@ -366,7 +485,7 @@ function createDesk() {
         handle.position.set(x + dx, 0.5, z + 0.78);
         scene.add(handle);
     });
-    
+
     // Legs
     const legGeo = new THREE.BoxGeometry(0.1, 0.9, 0.1);
     [[-1.6, -0.8], [-1.6, 0.8], [1.6, -0.8], [1.6, 0.8]].forEach(([lx, lz]) => {
@@ -375,7 +494,7 @@ function createDesk() {
         leg.castShadow = true;
         scene.add(leg);
     });
-    
+
     // Props on desk
     for (let i = 0; i < 4; i++) {
         const paper = new THREE.Mesh(
@@ -387,7 +506,7 @@ function createDesk() {
         paper.position.set(x - 0.8 + Math.random() * 0.6, 0.97, z + (Math.random() - 0.5) * 0.6);
         scene.add(paper);
     }
-    
+
     // Ink bottle
     const inkBottle = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.05, 0.1, 12),
@@ -395,7 +514,7 @@ function createDesk() {
     );
     inkBottle.position.set(x - 1.2, 1.02, z - 0.3);
     scene.add(inkBottle);
-    
+
     // Quill
     const quill = new THREE.Mesh(
         new THREE.ConeGeometry(0.01, 0.25, 8),
@@ -404,7 +523,7 @@ function createDesk() {
     quill.rotation.z = Math.PI / 6;
     quill.position.set(x - 1.1, 1.05, z - 0.3);
     scene.add(quill);
-    
+
     // Open book
     const openBook = new THREE.Mesh(
         new THREE.BoxGeometry(0.35, 0.02, 0.5),
@@ -413,16 +532,16 @@ function createDesk() {
     openBook.position.set(x + 0.3, 0.97, z);
     openBook.rotation.y = 0.1;
     scene.add(openBook);
-    
+
     // === DIE KARTE DER VERBORGENEN WEGE ===
     // Center of desk
     createMagicMap(x, 0.97, z);
-    
+
     addCollider(x, 0.5, z, 3.8, 1, 2);
-    
+
     // Main desk is now just for the magic map - no puzzle trigger
     // Puzzle 3 (cipher/runes) moves to the new rune desk
-    
+
     // Create the rune desk under the left window
     createRuneDesk();
 }
@@ -436,31 +555,31 @@ function createRuneDesk() {
     // Position where the old stairs were (right side of room)
     const x = 7.5;
     const z = 3;
-    
+
     const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
     const darkWoodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodDark, roughness: 0.7 });
-    
+
     // Small writing desk
     const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.9), woodMat);
     tableTop.position.set(x, 0.78, z);
     tableTop.castShadow = true;
     tableTop.receiveShadow = true;
     scene.add(tableTop);
-    
+
     // Desk legs
     [[-0.8, -0.35], [-0.8, 0.35], [0.8, -0.35], [0.8, 0.35]].forEach(([dx, dz]) => {
         const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.78, 0.06), darkWoodMat);
         leg.position.set(x + dx, 0.39, z + dz);
         scene.add(leg);
     });
-    
+
     addCollider(x, 0.4, z, 2, 0.85, 1.1);
-    
+
     // Large parchment with runes
     const parchment = new THREE.Mesh(
         new THREE.PlaneGeometry(0.6, 0.8),
-        new THREE.MeshStandardMaterial({ 
-            color: 0xf5e6c8, 
+        new THREE.MeshStandardMaterial({
+            color: 0xf5e6c8,
             roughness: 0.9,
             side: THREE.DoubleSide
         })
@@ -469,7 +588,7 @@ function createRuneDesk() {
     parchment.rotation.z = 0.05;
     parchment.position.set(x, 0.83, z);
     scene.add(parchment);
-    
+
     // Ink bottle (dark glass)
     const inkBottle = new THREE.Mesh(
         new THREE.CylinderGeometry(0.03, 0.04, 0.08, 12),
@@ -477,7 +596,7 @@ function createRuneDesk() {
     );
     inkBottle.position.set(x + 0.5, 0.86, z - 0.25);
     scene.add(inkBottle);
-    
+
     // Ink in bottle
     const ink = new THREE.Mesh(
         new THREE.CylinderGeometry(0.025, 0.035, 0.04, 12),
@@ -485,7 +604,7 @@ function createRuneDesk() {
     );
     ink.position.set(x + 0.5, 0.84, z - 0.25);
     scene.add(ink);
-    
+
     // Quill pen
     const quillMat = new THREE.MeshStandardMaterial({ color: 0xf0e8d8, roughness: 0.6 });
     const quillFeather = new THREE.Mesh(
@@ -496,7 +615,7 @@ function createRuneDesk() {
     quillFeather.rotation.x = 0.2;
     quillFeather.position.set(x + 0.6, 0.88, z - 0.1);
     scene.add(quillFeather);
-    
+
     // Second parchment (rolled)
     const rolledParchment = new THREE.Mesh(
         new THREE.CylinderGeometry(0.025, 0.025, 0.35, 12),
@@ -505,7 +624,7 @@ function createRuneDesk() {
     rolledParchment.rotation.z = Math.PI / 2;
     rolledParchment.position.set(x - 0.6, 0.85, z + 0.2);
     scene.add(rolledParchment);
-    
+
 
     // Small candle for reading
     const candleHolder = new THREE.Mesh(
@@ -549,10 +668,10 @@ function createRuneDesk() {
     // Trigger für das Leuchten-Spiel (game 5) auf der linken schwebenden Kerze
     // Trigger für das Leuchten-Event: etwas über und hinter der Glaskugel
     const fireGameZone = new THREE.Mesh(
-        new THREE.BoxGeometry(0.35, 0.5, 0.35),
+        new THREE.BoxGeometry(0.55, 0.6, 0.55),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    fireGameZone.position.set(0.74, 3.5, -3.3); // etwas höher und weiter zurück als die Kugel
+    fireGameZone.position.set(0.76, 3.5, -3.3); // etwas höher und weiter zurück als die Kugel
     fireGameZone.userData = { type: 'game5', hint: 'Was passiert wohl, wenn man die Kerze untersucht?', game: 5 };
     interactiveObjects.push(fireGameZone);
     scene.add(fireGameZone);
@@ -597,8 +716,8 @@ function createMagicMap(x, y, z) {
     scene.add(holder);
 
     // Parchment (map) on top of holder
-    const parchmentMat = new THREE.MeshStandardMaterial({ 
-        color: 0xe7d7b1, 
+    const parchmentMat = new THREE.MeshStandardMaterial({
+        color: 0xe7d7b1,
         roughness: 0.82,
         side: THREE.DoubleSide,
         map: null
@@ -633,10 +752,10 @@ function createMagicMap(x, y, z) {
     scene.add(rightRoll);
 
     // Simple ink lines to suggest a floor plan (as before)
-    const inkMat = new THREE.MeshBasicMaterial({ 
-        color: 0x3a2a1a, 
-        transparent: true, 
-        opacity: 0.85 
+    const inkMat = new THREE.MeshBasicMaterial({
+        color: 0x3a2a1a,
+        transparent: true,
+        opacity: 0.85
     });
     // Outer rectangle (simple room outline)
     const outline = new THREE.Mesh(
@@ -672,8 +791,8 @@ function createMagicMap(x, y, z) {
         new THREE.MeshBasicMaterial({ visible: false })
     );
     mapInteract.position.set(x, y + 0.25, z);
-    mapInteract.userData = { 
-        type: 'magicMap', 
+    mapInteract.userData = {
+        type: 'magicMap',
         hint: 'Die Karte des Rumtreibers betrachten',
         game: null
     };
@@ -684,10 +803,10 @@ function createMagicMap(x, y, z) {
 function createMapLine(points, baseX, baseY, baseZ, material) {
     const shape = new THREE.Shape();
     const lineWidth = 0.003;
-    
+
     // Create a thin plane for each segment
     const group = new THREE.Group();
-    
+
     for (let i = 0; i < points.length - 1; i++) {
         const start = points[i];
         const end = points[i + 1];
@@ -695,7 +814,7 @@ function createMapLine(points, baseX, baseY, baseZ, material) {
         const dz = end[1] - start[1];
         const length = Math.sqrt(dx * dx + dz * dz);
         const angle = Math.atan2(dz, dx);
-        
+
         const segment = new THREE.Mesh(
             new THREE.PlaneGeometry(length, lineWidth),
             material
@@ -709,7 +828,7 @@ function createMapLine(points, baseX, baseY, baseZ, material) {
         segment.rotation.z = -angle;
         group.add(segment);
     }
-    
+
     group.position.set(baseX, baseY, baseZ);
     return group;
 }
@@ -717,41 +836,41 @@ function createMapLine(points, baseX, baseY, baseZ, material) {
 function createMapSymbol(x, y, z, symbol, angle) {
     // Create a small glowing marker for each puzzle location
     const group = new THREE.Group();
-    
+
     // Circular marker
     const marker = new THREE.Mesh(
         new THREE.CircleGeometry(0.018, 12),
-        new THREE.MeshBasicMaterial({ 
-            color: 0xc9a227, 
-            transparent: true, 
-            opacity: 0.8 
+        new THREE.MeshBasicMaterial({
+            color: 0xc9a227,
+            transparent: true,
+            opacity: 0.8
         })
     );
     marker.rotation.x = -Math.PI / 2;
     group.add(marker);
-    
+
     // Outer ring
     const ring = new THREE.Mesh(
         new THREE.RingGeometry(0.02, 0.025, 16),
-        new THREE.MeshBasicMaterial({ 
-            color: 0x8b7355, 
-            transparent: true, 
+        new THREE.MeshBasicMaterial({
+            color: 0x8b7355,
+            transparent: true,
             opacity: 0.6,
             side: THREE.DoubleSide
         })
     );
     ring.rotation.x = -Math.PI / 2;
     group.add(ring);
-    
+
     group.position.set(x, y, z);
     group.rotation.y = angle;
-    
+
     return group;
 }
 
 function createCompassRose(x, y, z) {
     const group = new THREE.Group();
-    
+
     // Main circle
     const circle = new THREE.Mesh(
         new THREE.RingGeometry(0.025, 0.03, 16),
@@ -759,10 +878,10 @@ function createCompassRose(x, y, z) {
     );
     circle.rotation.x = -Math.PI / 2;
     group.add(circle);
-    
+
     // Cardinal points
     const pointMat = new THREE.MeshBasicMaterial({ color: 0x3a2a1a, side: THREE.DoubleSide });
-    [0, Math.PI/2, Math.PI, Math.PI * 1.5].forEach((angle, i) => {
+    [0, Math.PI / 2, Math.PI, Math.PI * 1.5].forEach((angle, i) => {
         const point = new THREE.Mesh(
             new THREE.ConeGeometry(0.008, 0.025, 4),
             pointMat
@@ -772,7 +891,7 @@ function createCompassRose(x, y, z) {
         point.rotation.z = angle + Math.PI / 2;
         group.add(point);
     });
-    
+
     // North indicator (slightly larger)
     const north = new THREE.Mesh(
         new THREE.ConeGeometry(0.01, 0.03, 4),
@@ -782,7 +901,7 @@ function createCompassRose(x, y, z) {
     north.rotation.x = -Math.PI / 2;
     north.rotation.z = Math.PI;
     group.add(north);
-    
+
     group.position.set(x, y, z);
     scene.add(group);
 }
@@ -796,19 +915,19 @@ function revealMapPath(puzzleNumber) {
         // Animate opacity
         animateMapElement(pathElement.material, 0, 0.8, 1500);
     }
-    
+
     // Reveal the symbol
     const symbolElement = magicMapElements.symbols.find(s => s.puzzleIndex === puzzleNumber);
     if (symbolElement) {
         symbolElement.group.visible = true;
     }
-    
+
     // Update glow intensity based on progress
     const solvedCount = magicMapElements.pathLines.filter(p => p.mesh.visible).length;
     if (magicMapElements.glowLight) {
         magicMapElements.glowLight.intensity = solvedCount * 0.15;
     }
-    
+
     // Check if all 7 puzzles solved → reveal final path
     if (solvedCount >= 7) {
         revealFinalPath();
@@ -817,10 +936,10 @@ function revealMapPath(puzzleNumber) {
 
 function revealFinalPath() {
     if (!magicMapElements.finalPath) return;
-    
+
     magicMapElements.finalPath.mesh.visible = true;
     animateMapElement(magicMapElements.finalPath.material, 0, 1.0, 2000);
-    
+
     // Intensify glow
     if (magicMapElements.glowLight) {
         magicMapElements.glowLight.intensity = 2.0;
@@ -830,37 +949,37 @@ function revealFinalPath() {
 
 function animateMapElement(material, fromOpacity, toOpacity, duration) {
     const startTime = performance.now();
-    
+
     function animate() {
         const elapsed = performance.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
-        
+
         material.opacity = fromOpacity + (toOpacity - fromOpacity) * eased;
-        
+
         if (progress < 1) {
             requestAnimationFrame(animate);
         }
     }
-    
+
     animate();
 }
 
 function createMagicOrb() {
     const x = 0.8, y = 0.97, z = -3;
-    
+
     // Stand
     const standMat = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, metalness: 0.3, roughness: 0.6 });
     const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.12, 16), standMat);
     stand.position.set(x, y + 0.06, z);
     scene.add(stand);
-    
+
     // Orb
     const orbMat = new THREE.MeshBasicMaterial({ color: 0x5588bb, transparent: true, opacity: 0.75 });
     const orb = new THREE.Mesh(new THREE.SphereGeometry(0.15, 32, 32), orbMat);
     orb.position.set(x, y + 0.27, z);
     scene.add(orb);
-    
+
     // Outer glow
     const glowMat = new THREE.MeshBasicMaterial({
         color: 0x88aadd, transparent: true, opacity: 0.15,
@@ -869,14 +988,14 @@ function createMagicOrb() {
     orbGlow = new THREE.Mesh(new THREE.SphereGeometry(0.28, 32, 32), glowMat);
     orbGlow.position.set(x, y + 0.27, z);
     scene.add(orbGlow);
-    
+
     // Light
     orbLight = new THREE.PointLight(0x6699cc, CONFIG.lighting.orbIntensity, 4);
     orbLight.position.set(x, y + 0.27, z);
     scene.add(orbLight);
-    
+
     createOrbDustParticles(x, y + 0.27, z);
-    
+
     // Interactive zone for orb (if needed, but NOT for game5/leuchten)
     // (game5 trigger is now on the floating candle above the desk)
 }
@@ -893,29 +1012,29 @@ function createAlchemyStation() {
     // Position against front wall under right window (z=-4 window)
     const w = CONFIG.room.width;
     const d = CONFIG.room.depth;
-    const baseX = 4, baseZ = -d/2 + 1.2;  // Against front wall
-    
+    const baseX = 4, baseZ = -d / 2 + 1.2;  // Against front wall
+
     const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
     const darkWoodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodDark, roughness: 0.7 });
     const metalMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, metalness: 0.6, roughness: 0.4 });
     const copperMat = new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: 0.7, roughness: 0.3 });
-    
+
     // === WORKTABLE ===
     const tableTop = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.1, 1.2), woodMat);
     tableTop.position.set(baseX, 0.85, baseZ);
     tableTop.castShadow = true;
     tableTop.receiveShadow = true;
     scene.add(tableTop);
-    
+
     // Table legs
     [[-1.1, -0.5], [-1.1, 0.5], [1.1, -0.5], [1.1, 0.5]].forEach(([dx, dz]) => {
         const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.85, 0.08), darkWoodMat);
         leg.position.set(baseX + dx, 0.425, baseZ + dz);
         scene.add(leg);
     });
-    
+
     addCollider(baseX, 0.5, baseZ, 2.7, 1, 1.4);
-    
+
     // === CAULDRON (central piece) ===
     const cauldronBody = new THREE.Mesh(
         new THREE.SphereGeometry(0.25, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.7),
@@ -924,7 +1043,7 @@ function createAlchemyStation() {
     cauldronBody.position.set(baseX, 1.05, baseZ);
     cauldronBody.castShadow = true;
     scene.add(cauldronBody);
-    
+
     // Cauldron rim
     const cauldronRim = new THREE.Mesh(
         new THREE.TorusGeometry(0.22, 0.03, 12, 24),
@@ -933,7 +1052,7 @@ function createAlchemyStation() {
     cauldronRim.position.set(baseX, 1.15, baseZ);
     cauldronRim.rotation.x = Math.PI / 2;
     scene.add(cauldronRim);
-    
+
     // Cauldron legs
     for (let i = 0; i < 3; i++) {
         const angle = (i / 3) * Math.PI * 2;
@@ -948,12 +1067,12 @@ function createAlchemyStation() {
         );
         scene.add(leg);
     }
-    
+
     // Bubbling liquid in cauldron
-    const liquidMat = new THREE.MeshBasicMaterial({ 
-        color: 0x44aa55, 
-        transparent: true, 
-        opacity: 0.7 
+    const liquidMat = new THREE.MeshBasicMaterial({
+        color: 0x44aa55,
+        transparent: true,
+        opacity: 0.7
     });
     const liquid = new THREE.Mesh(
         new THREE.CircleGeometry(0.18, 24),
@@ -962,10 +1081,10 @@ function createAlchemyStation() {
     liquid.position.set(baseX, 1.12, baseZ);
     liquid.rotation.x = -Math.PI / 2;
     scene.add(liquid);
-    
+
     // Steam/bubbles particles above cauldron
     createCauldronSteam(baseX, 1.15, baseZ);
-    
+
     // === INGREDIENT JARS ===
     const jarPositions = [
         { x: -0.9, z: -0.3, color: 0x2d5a27, label: 'Fluxkraut' },
@@ -975,21 +1094,21 @@ function createAlchemyStation() {
         { x: 0.9, z: -0.3, color: 0x8fbc8f, label: 'Knöterich' },
         { x: 0.9, z: 0.3, color: 0xdaa520, label: 'Goldstaub' }
     ];
-    
+
     jarPositions.forEach(jar => {
         // Jar body
         const jarMesh = new THREE.Mesh(
             new THREE.CylinderGeometry(0.05, 0.06, 0.12, 12),
-            new THREE.MeshStandardMaterial({ 
-                color: 0xaabbcc, 
-                transparent: true, 
-                opacity: 0.4, 
-                roughness: 0.1 
+            new THREE.MeshStandardMaterial({
+                color: 0xaabbcc,
+                transparent: true,
+                opacity: 0.4,
+                roughness: 0.1
             })
         );
         jarMesh.position.set(baseX + jar.x, 0.96, baseZ + jar.z);
         scene.add(jarMesh);
-        
+
         // Contents
         const contents = new THREE.Mesh(
             new THREE.CylinderGeometry(0.04, 0.05, 0.08, 12),
@@ -997,7 +1116,7 @@ function createAlchemyStation() {
         );
         contents.position.set(baseX + jar.x, 0.94, baseZ + jar.z);
         scene.add(contents);
-        
+
         // Cork/lid
         const lid = new THREE.Mesh(
             new THREE.CylinderGeometry(0.04, 0.05, 0.025, 12),
@@ -1006,7 +1125,7 @@ function createAlchemyStation() {
         lid.position.set(baseX + jar.x, 1.03, baseZ + jar.z);
         scene.add(lid);
     });
-    
+
     // === MORTAR & PESTLE ===
     const mortar = new THREE.Mesh(
         new THREE.CylinderGeometry(0.06, 0.08, 0.08, 16),
@@ -1014,7 +1133,7 @@ function createAlchemyStation() {
     );
     mortar.position.set(baseX + 0.4, 0.94, baseZ);
     scene.add(mortar);
-    
+
     const pestle = new THREE.Mesh(
         new THREE.CylinderGeometry(0.015, 0.02, 0.12, 8),
         new THREE.MeshStandardMaterial({ color: 0x5a524a })
@@ -1022,7 +1141,7 @@ function createAlchemyStation() {
     pestle.position.set(baseX + 0.42, 1.0, baseZ);
     pestle.rotation.z = 0.3;
     scene.add(pestle);
-    
+
     // === SCALES ===
     const scaleBase = new THREE.Mesh(
         new THREE.BoxGeometry(0.12, 0.02, 0.08),
@@ -1030,14 +1149,14 @@ function createAlchemyStation() {
     );
     scaleBase.position.set(baseX - 0.5, 0.91, baseZ);
     scene.add(scaleBase);
-    
+
     const scalePost = new THREE.Mesh(
         new THREE.CylinderGeometry(0.01, 0.01, 0.15, 8),
         copperMat
     );
     scalePost.position.set(baseX - 0.5, 0.985, baseZ);
     scene.add(scalePost);
-    
+
     const scaleArm = new THREE.Mesh(
         new THREE.BoxGeometry(0.18, 0.008, 0.015),
         copperMat
@@ -1045,7 +1164,7 @@ function createAlchemyStation() {
     scaleArm.position.set(baseX - 0.5, 1.06, baseZ);
     scaleArm.rotation.z = 0.05; // Slight tilt
     scene.add(scaleArm);
-    
+
     // Scale pans
     [-0.08, 0.08].forEach(dx => {
         const pan = new THREE.Mesh(
@@ -1055,13 +1174,13 @@ function createAlchemyStation() {
         pan.position.set(baseX - 0.5 + dx, 1.02 + (dx > 0 ? -0.01 : 0.01), baseZ);
         scene.add(pan);
     });
-    
+
     // === WALL SHELF with more potions ===
     const shelfY = 2.2;
     const shelf = new THREE.Mesh(new THREE.BoxGeometry(2, 0.06, 0.35), woodMat);
     shelf.position.set(baseX, shelfY, baseZ - 0.75);
     scene.add(shelf);
-    
+
     // Shelf brackets
     [-0.8, 0.8].forEach(dx => {
         const bracket = new THREE.Mesh(
@@ -1071,7 +1190,7 @@ function createAlchemyStation() {
         bracket.position.set(baseX + dx, shelfY - 0.15, baseZ - 0.75);
         scene.add(bracket);
     });
-    
+
     // Potion bottles on shelf
     const potionConfigs = [
         { dx: -0.7, color: 0x44aa55, h: 0.18 },
@@ -1080,21 +1199,21 @@ function createAlchemyStation() {
         { dx: 0.35, color: 0xaa4444, h: 0.2 },
         { dx: 0.7, color: 0x4466aa, h: 0.17 }
     ];
-    
+
     potionConfigs.forEach(conf => {
         const bottle = new THREE.Mesh(
             new THREE.CylinderGeometry(0.04, 0.06, conf.h, 12),
-            new THREE.MeshStandardMaterial({ 
-                color: conf.color, 
-                transparent: true, 
-                opacity: 0.7, 
-                roughness: 0.2 
+            new THREE.MeshStandardMaterial({
+                color: conf.color,
+                transparent: true,
+                opacity: 0.7,
+                roughness: 0.2
             })
         );
-        bottle.position.set(baseX + conf.dx, shelfY + 0.03 + conf.h/2, baseZ - 0.75);
+        bottle.position.set(baseX + conf.dx, shelfY + 0.03 + conf.h / 2, baseZ - 0.75);
         bottle.castShadow = true;
         scene.add(bottle);
-        
+
         const cork = new THREE.Mesh(
             new THREE.CylinderGeometry(0.025, 0.03, 0.03, 8),
             new THREE.MeshStandardMaterial({ color: 0x8b7355 })
@@ -1102,32 +1221,32 @@ function createAlchemyStation() {
         cork.position.set(baseX + conf.dx, shelfY + 0.03 + conf.h + 0.015, baseZ - 0.75);
         scene.add(cork);
     });
-    
+
     // === RECIPE NOTES ===
-    const notesMat = new THREE.MeshStandardMaterial({ 
-        color: 0xf5e6d3, 
+    const notesMat = new THREE.MeshStandardMaterial({
+        color: 0xf5e6d3,
         roughness: 0.9,
         side: THREE.DoubleSide
     });
-    
+
     // Pinned note on wall
     const note = new THREE.Mesh(new THREE.PlaneGeometry(0.25, 0.35), notesMat);
     note.position.set(baseX - 0.6, 1.6, baseZ - 0.98);
     note.rotation.y = 0.1;
     scene.add(note);
-    
+
     // Note on table
     const tableNote = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.15), notesMat);
     tableNote.position.set(baseX - 0.3, 0.91, baseZ + 0.35);
     tableNote.rotation.x = -Math.PI / 2;
     tableNote.rotation.z = 0.2;
     scene.add(tableNote);
-    
+
     // === WARM LIGHT for the station ===
     const alchemyLight = new THREE.PointLight(0x88cc88, 0.5, 4);
     alchemyLight.position.set(baseX, 1.8, baseZ);
     scene.add(alchemyLight);
-    
+
     // === INTERACTIVE ZONE ===
     const interactZone = new THREE.Mesh(
         new THREE.BoxGeometry(1.5, 1.5, 1.2),
@@ -1144,7 +1263,7 @@ function createCauldronSteam(x, y, z) {
     const count = 30;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
-    
+
     for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const radius = Math.random() * 0.15;
@@ -1152,13 +1271,13 @@ function createCauldronSteam(x, y, z) {
         positions[i * 3 + 1] = y + Math.random() * 0.5;
         positions[i * 3 + 2] = z + Math.sin(angle) * radius;
     }
-    
+
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.userData = {
         baseX: x, baseY: y, baseZ: z,
         speeds: new Float32Array(count).fill(0).map(() => 0.01 + Math.random() * 0.02)
     };
-    
+
     const material = new THREE.PointsMaterial({
         size: 0.04,
         color: 0x88dd88,
@@ -1167,11 +1286,11 @@ function createCauldronSteam(x, y, z) {
         blending: THREE.AdditiveBlending,
         depthWrite: false
     });
-    
+
     const steam = new THREE.Points(geometry, material);
     steam.userData.isSteam = true;
     scene.add(steam);
-    
+
     // Store reference for animation
     if (!window.cauldronSteam) window.cauldronSteam = [];
     window.cauldronSteam.push(steam);
@@ -1180,14 +1299,14 @@ function createCauldronSteam(x, y, z) {
 function createBells() {
     // Position exakt unter dem Kaminsims (Mantle)
     const w = CONFIG.room.width;
-    const wallX = -w/2;
+    const wallX = -w / 2;
     const x = wallX + 0.8; // exakt unter mantle.position.x
     const y = 2.8;         // noch etwas tiefer unter dem Sims
     const z = 0;           // mittig im Raum
-    
+
     const bellSizes = [0.08, 0.1, 0.12, 0.1, 0.08];
     const bellMat = new THREE.MeshStandardMaterial({ color: 0xd4a855, metalness: 0.7, roughness: 0.25 });
-    
+
     bellSizes.forEach((size, i) => {
         const bell = new THREE.Mesh(new THREE.ConeGeometry(size, size * 1.8, 16), bellMat);
         // Bells hang in a row along z axis (parallel to wall)
@@ -1214,7 +1333,7 @@ function createBells() {
         interactiveObjects.push(bellTestZone);
         scene.add(bellTestZone);
     });
-    
+
     const interactZone = new THREE.Mesh(
         new THREE.BoxGeometry(0.3, 0.6, 0.8),
         new THREE.MeshBasicMaterial({ visible: false })
@@ -1229,32 +1348,32 @@ function createWallKey() {
     // GROSSER, SICHTBARER Schlüssel-Vitrine - LINKS NEBEN dem Alchemie-Tisch (potions)
     const w = CONFIG.room.width;
     const d = CONFIG.room.depth;
-    
+
     // Position: Links neben der Alchemy Station (die ist bei x=4, z=-d/2+1.2)
     // Wir setzen die Vitrine an die Vorderwand, links vom Alchemietisch
     const x = -4;           // Noch weiter links vom Alchemietisch (der ist bei x=4)
     const y = 1.5;           // Augenhöhe
-    const z = -d/2 + 0.2;    // An der Vorderwand
-    
-    const goldMat = new THREE.MeshStandardMaterial({ 
-        color: 0xffd700, 
-        metalness: 0.9, 
+    const z = -d / 2 + 0.2;    // An der Vorderwand
+
+    const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        metalness: 0.9,
         roughness: 0.1,
         emissive: 0xffa500,
         emissiveIntensity: 0.3
     });
-    const glassMat = new THREE.MeshStandardMaterial({ 
+    const glassMat = new THREE.MeshStandardMaterial({
         color: 0x8899aa,
         transparent: true,
         opacity: 0.3,
         roughness: 0.1,
         metalness: 0.2
     });
-    const woodMat = new THREE.MeshStandardMaterial({ 
-        color: 0x4a3520, 
-        roughness: 0.7 
+    const woodMat = new THREE.MeshStandardMaterial({
+        color: 0x4a3520,
+        roughness: 0.7
     });
-    
+
     // Größerer Holzrahmen/Vitrine - an der WAND befestigt
     const frameBack = new THREE.Mesh(
         new THREE.BoxGeometry(0.8, 1.0, 0.15),
@@ -1262,7 +1381,7 @@ function createWallKey() {
     );
     frameBack.position.set(x, y, z);
     scene.add(frameBack);
-    
+
     // Glasfront
     const glass = new THREE.Mesh(
         new THREE.BoxGeometry(0.65, 0.85, 0.02),
@@ -1270,7 +1389,7 @@ function createWallKey() {
     );
     glass.position.set(x, y, z + 0.1);
     scene.add(glass);
-    
+
     // GROSSER Schlüssel - orientiert für Vorderwand (zeigt in den Raum +Z)
     // Key bow (the round top part) - VIEL GRÖSSER
     const keyBow = new THREE.Mesh(
@@ -1280,7 +1399,7 @@ function createWallKey() {
     keyBow.position.set(x, y + 0.2, z + 0.08);
     keyBow.rotation.x = Math.PI / 2;
     scene.add(keyBow);
-    
+
     // Key stem - GRÖSSER
     const keyStem = new THREE.Mesh(
         new THREE.BoxGeometry(0.04, 0.45, 0.04),
@@ -1288,7 +1407,7 @@ function createWallKey() {
     );
     keyStem.position.set(x, y - 0.1, z + 0.08);
     scene.add(keyStem);
-    
+
     // Key bit (the teeth) - GRÖSSER
     const keyBit1 = new THREE.Mesh(
         new THREE.BoxGeometry(0.08, 0.06, 0.04),
@@ -1296,19 +1415,19 @@ function createWallKey() {
     );
     keyBit1.position.set(x + 0.04, y - 0.28, z + 0.08);
     scene.add(keyBit1);
-    
+
     const keyBit2 = new THREE.Mesh(
         new THREE.BoxGeometry(0.06, 0.1, 0.04),
         goldMat
     );
     keyBit2.position.set(x - 0.04, y - 0.22, z + 0.08);
     scene.add(keyBit2);
-    
+
     // Starker Glow für Sichtbarkeit
     const keyGlow = new THREE.PointLight(0xffd700, 1.5, 4);
     keyGlow.position.set(x, y, z + 0.5);
     scene.add(keyGlow);
-    
+
     // Interactive zone - GRÖSSER für leichteres Finden
     const interactZone = new THREE.Mesh(
         new THREE.BoxGeometry(1.2, 1.5, 1.0),
@@ -1325,21 +1444,21 @@ function createStairs() {
     // Hidden magical element that triggers the staircase puzzle
     const w = CONFIG.room.width;
     const d = CONFIG.room.depth;
-    
-    const x = -w/2 + 2.5;  // Left side
+
+    const x = -w / 2 + 2.5;  // Left side
     const y = 1.5;          // Floating height
-    const z = d/2 - 3;      // Back corner, under balcony
-    
-    const woodMat = new THREE.MeshStandardMaterial({ 
-        color: 0x8b7355, 
+    const z = d / 2 - 3;      // Back corner, under balcony
+
+    const woodMat = new THREE.MeshStandardMaterial({
+        color: 0x8b7355,
         roughness: 0.6,
         emissive: 0x221100,
         emissiveIntensity: 0.1
     });
-    
+
     // Create floating miniature staircase segments
     const stairsGroup = new THREE.Group();
-    
+
     // 5 small floating stair segments that rotate slowly
     for (let i = 0; i < 5; i++) {
         const segment = new THREE.Group();
@@ -1363,19 +1482,19 @@ function createStairs() {
         segment.rotation.x = Math.random() * 0.3 - 0.15;
         stairsGroup.add(segment);
     }
-    
+
     stairsGroup.position.set(x, y, z);
     scene.add(stairsGroup);
-    
+
     // Store reference for animation
     if (!window.floatingStairs) window.floatingStairs = [];
     window.floatingStairs.push(stairsGroup);
-    
+
     // Soft magical glow
     const stairsGlow = new THREE.PointLight(0xaa8866, 0.3, 2);
     stairsGlow.position.set(x, y, z);
     scene.add(stairsGlow);
-    
+
     // Interactive trigger zone
     const interactZone = new THREE.Mesh(
         new THREE.BoxGeometry(0.8, 1.2, 0.8),
@@ -1390,9 +1509,9 @@ function createStairs() {
 function createMezzanine() {
     const mezzMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.6 });
     const railMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium });
-    
+
     // Right side mezzanine removed - only entrance balcony remains
-    
+
     // === ENTRANCE BALCONY (back wall - player spawn point) ===
     createEntranceBalcony(mezzMat, railMat);
 }
@@ -1407,12 +1526,12 @@ function createEntranceBalcony(mezzMat, railMat) {
     // Floor level: player feet = startY - height, so platform top should be there
     const floorSurfaceY = CONFIG.player.startY - CONFIG.player.height;
     const platformThickness = 0.25;
-    const platformCenterY = floorSurfaceY - platformThickness/2;  // Center of platform geometry
-    const balconyZ = d/2 - 2.5;  // Near back wall
-    
+    const platformCenterY = floorSurfaceY - platformThickness / 2;  // Center of platform geometry
+    const balconyZ = d / 2 - 2.5;  // Near back wall
+
     // Main platform
     const entrancePlatform = new THREE.Mesh(
-        new THREE.BoxGeometry(balconyWidth, platformThickness, balconyDepth), 
+        new THREE.BoxGeometry(balconyWidth, platformThickness, balconyDepth),
         mezzMat
     );
     entrancePlatform.position.set(0, platformCenterY, balconyZ);
@@ -1421,61 +1540,61 @@ function createEntranceBalcony(mezzMat, railMat) {
     scene.add(entrancePlatform);
     // Collider for the floor surface (top at floorSurfaceY)
     addCollider(0, platformCenterY, balconyZ, balconyWidth, platformThickness, balconyDepth);
-    
+
     // Stair opening positions (x = -4 and x = 4, width 1.8m each)
     const stairOpeningWidth = 1.8;
     const leftStairX = -4;
     const rightStairX = 4;
-    
+
     // Front railing with gaps for stairs - 3 segments
     const railY = floorSurfaceY + 0.9;
-    const railZ = balconyZ - balconyDepth/2 + 0.1;
-    
+    const railZ = balconyZ - balconyDepth / 2 + 0.1;
+
     // Left segment: from -balconyWidth/2 to left stair opening
-    const leftSegmentWidth = (balconyWidth/2 + leftStairX) - stairOpeningWidth/2;
-    const leftSegmentX = -balconyWidth/2 + leftSegmentWidth/2;
+    const leftSegmentWidth = (balconyWidth / 2 + leftStairX) - stairOpeningWidth / 2;
+    const leftSegmentX = -balconyWidth / 2 + leftSegmentWidth / 2;
     if (leftSegmentWidth > 0.2) {
         const leftRail = new THREE.Mesh(new THREE.BoxGeometry(leftSegmentWidth, 0.1, 0.12), railMat);
         leftRail.position.set(leftSegmentX, railY, railZ);
         scene.add(leftRail);
-        addCollider(leftSegmentX, floorSurfaceY + 0.5, balconyZ - balconyDepth/2, leftSegmentWidth, 1, 0.2);
+        addCollider(leftSegmentX, floorSurfaceY + 0.5, balconyZ - balconyDepth / 2, leftSegmentWidth, 1, 0.2);
     }
-    
+
     // Middle segment: between the two stair openings
-    const middleSegmentWidth = (rightStairX - stairOpeningWidth/2) - (leftStairX + stairOpeningWidth/2);
+    const middleSegmentWidth = (rightStairX - stairOpeningWidth / 2) - (leftStairX + stairOpeningWidth / 2);
     const middleSegmentX = 0;
     const middleRail = new THREE.Mesh(new THREE.BoxGeometry(middleSegmentWidth, 0.1, 0.12), railMat);
     middleRail.position.set(middleSegmentX, railY, railZ);
     scene.add(middleRail);
-    addCollider(middleSegmentX, floorSurfaceY + 0.5, balconyZ - balconyDepth/2, middleSegmentWidth, 1, 0.2);
-    
+    addCollider(middleSegmentX, floorSurfaceY + 0.5, balconyZ - balconyDepth / 2, middleSegmentWidth, 1, 0.2);
+
     // Right segment: from right stair opening to balconyWidth/2
-    const rightSegmentWidth = (balconyWidth/2 - rightStairX) - stairOpeningWidth/2;
-    const rightSegmentX = balconyWidth/2 - rightSegmentWidth/2;
+    const rightSegmentWidth = (balconyWidth / 2 - rightStairX) - stairOpeningWidth / 2;
+    const rightSegmentX = balconyWidth / 2 - rightSegmentWidth / 2;
     if (rightSegmentWidth > 0.2) {
         const rightRail = new THREE.Mesh(new THREE.BoxGeometry(rightSegmentWidth, 0.1, 0.12), railMat);
         rightRail.position.set(rightSegmentX, railY, railZ);
         scene.add(rightRail);
-        addCollider(rightSegmentX, floorSurfaceY + 0.5, balconyZ - balconyDepth/2, rightSegmentWidth, 1, 0.2);
+        addCollider(rightSegmentX, floorSurfaceY + 0.5, balconyZ - balconyDepth / 2, rightSegmentWidth, 1, 0.2);
     }
-    
+
     // Balusters - skip stair openings
     for (let i = 0; i < 20; i++) {
-        const x = -balconyWidth/2 + 0.4 + i * (balconyWidth - 0.8) / 19;
+        const x = -balconyWidth / 2 + 0.4 + i * (balconyWidth - 0.8) / 19;
         // Skip balusters in stair openings
-        if (Math.abs(x - leftStairX) < stairOpeningWidth/2 + 0.1) continue;
-        if (Math.abs(x - rightStairX) < stairOpeningWidth/2 + 0.1) continue;
-        
+        if (Math.abs(x - leftStairX) < stairOpeningWidth / 2 + 0.1) continue;
+        if (Math.abs(x - rightStairX) < stairOpeningWidth / 2 + 0.1) continue;
+
         const baluster = new THREE.Mesh(
-            new THREE.BoxGeometry(0.08, 0.8, 0.08), 
+            new THREE.BoxGeometry(0.08, 0.8, 0.08),
             railMat
         );
         baluster.position.set(x, floorSurfaceY + 0.5, railZ);
         scene.add(baluster);
     }
-    
+
     // Side railings  
-    [-balconyWidth/2 + 0.1, balconyWidth/2 - 0.1].forEach(x => {
+    [-balconyWidth / 2 + 0.1, balconyWidth / 2 - 0.1].forEach(x => {
         const sideRail = new THREE.Mesh(
             new THREE.BoxGeometry(0.1, 0.9, balconyDepth - 0.5),
             railMat
@@ -1484,7 +1603,7 @@ function createEntranceBalcony(mezzMat, railMat) {
         scene.add(sideRail);
         addCollider(x, floorSurfaceY + 0.5, balconyZ, 0.2, 1, balconyDepth);
     });
-    
+
     // Support beams underneath
     [-3, 0, 3].forEach(dx => {
         const beam = new THREE.Mesh(
@@ -1495,20 +1614,20 @@ function createEntranceBalcony(mezzMat, railMat) {
         beam.castShadow = true;
         scene.add(beam);
     });
-    
+
     // Decorative brackets under balcony
     [-4, -2, 2, 4].forEach(dx => {
         const bracket = new THREE.Mesh(
             new THREE.BoxGeometry(0.15, 0.5, 0.8),
             railMat
         );
-        bracket.position.set(dx, floorSurfaceY - 0.35, balconyZ - balconyDepth/2 + 0.5);
+        bracket.position.set(dx, floorSurfaceY - 0.35, balconyZ - balconyDepth / 2 + 0.5);
         scene.add(bracket);
     });
-    
+
     // === STAIRS DOWN from balcony ===
-    createBalconyStairs(-4, floorSurfaceY, balconyZ - balconyDepth/2, mezzMat, railMat);
-    createBalconyStairs(4, floorSurfaceY, balconyZ - balconyDepth/2, mezzMat, railMat);
+    createBalconyStairs(-4, floorSurfaceY, balconyZ - balconyDepth / 2, mezzMat, railMat);
+    createBalconyStairs(4, floorSurfaceY, balconyZ - balconyDepth / 2, mezzMat, railMat);
 }
 
 function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
@@ -1519,11 +1638,11 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
     const stepDepth = 0.4;
     const stepWidth = 1.6;
     const totalDepth = stepCount * stepDepth;
-    
+
     // Create VISUAL steps only
     for (let i = 0; i < stepCount; i++) {
         const stepY = startY - (i + 1) * stepHeight;
-        const stepZ = startZ - i * stepDepth - stepDepth/2;
+        const stepZ = startZ - i * stepDepth - stepDepth / 2;
         const step = new THREE.Mesh(
             new THREE.BoxGeometry(stepWidth, 0.15, stepDepth),
             mezzMat
@@ -1537,7 +1656,7 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
         }
         scene.add(step);
     }
-    
+
     // Create SMOOTH RAMP COLLIDER - one continuous slope
     // Stop before ground level to prevent sticking in floor
     const rampSegments = 40;
@@ -1546,30 +1665,30 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
         const nextT = (i + 1) / rampSegments;
         const midT = (t + nextT) / 2;
         const segY = startY * (1 - midT);
-        
+
         // Skip the last few segments near ground level
         if (segY < 0.2) continue;
-        
+
         const segZ = startZ - midT * totalDepth;
         const segmentDepth = totalDepth / rampSegments;
         addCollider(startX, segY, segZ, stepWidth, 0.08, segmentDepth + 0.1);
     }
-    
+
     // === RAILINGS ON BOTH SIDES ===
     const railHeight = 1.1;
     const railOffset = stepWidth / 2 + 0.06;
-    
+
     [-1, 1].forEach(side => {
         const xOffset = side * railOffset;
-        
+
         // Railing posts at each step
         for (let i = 0; i <= stepCount; i++) {
             const postY = startY - i * stepHeight;
             const postZ = startZ - i * stepDepth;
-            
+
             // Skip bottom post (at ground level)
             if (postY < 0.1) continue;
-            
+
             const post = new THREE.Mesh(
                 new THREE.BoxGeometry(0.08, railHeight, 0.08),
                 railMat
@@ -1577,11 +1696,11 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
             post.position.set(startX + xOffset, postY + railHeight / 2, postZ);
             scene.add(post);
         }
-        
+
         // Handrail following the slope
         const railLength = Math.sqrt(totalDepth * totalDepth + startY * startY);
         const railAngle = -Math.atan2(startY, totalDepth);
-        
+
         const handrail = new THREE.Mesh(
             new THREE.BoxGeometry(0.08, 0.08, railLength),
             railMat
@@ -1593,7 +1712,7 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
         );
         handrail.rotation.x = railAngle;
         scene.add(handrail);
-        
+
         // Collision walls - skip near ground
         for (let i = 0; i < rampSegments; i++) {
             const t = (i + 0.5) / rampSegments;
@@ -1611,7 +1730,7 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
 function createProps() {
     // === FIREPLACE LOUNGE ZONE ===
     createFireplaceLounge();
-    
+
     createCandelabra(-0.5, 0.97, -3.2);
 }
 
@@ -1621,33 +1740,33 @@ function createProps() {
 function createFireplaceLounge() {
     // Position in front of fireplace (fireplace is at left wall, z=0)
     const w = CONFIG.room.width;
-    const loungeX = -w/2 + 4;  // In front of fireplace
+    const loungeX = -w / 2 + 4;  // In front of fireplace
     const loungeZ = 0;         // Same Z as fireplace
-    
+
     // === LARGE ORNATE RUG ===
     const rugMat = new THREE.MeshStandardMaterial({ color: 0x5a2525, roughness: 0.95 });
     const rugBorderMat = new THREE.MeshStandardMaterial({ color: 0x3a1515, roughness: 0.95 });
     const rugGoldMat = new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.8 });
-    
+
     // Main rug
     const rug = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), rugMat);
     rug.rotation.x = -Math.PI / 2;
     rug.position.set(loungeX, 0.003, loungeZ);
     rug.receiveShadow = true;
     scene.add(rug);
-    
+
     // Inner border
     const innerBorder = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 2.6), rugBorderMat);
     innerBorder.rotation.x = -Math.PI / 2;
     innerBorder.position.set(loungeX, 0.004, loungeZ);
     scene.add(innerBorder);
-    
+
     // Center pattern
     const centerPattern = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 1.8), rugMat);
     centerPattern.rotation.x = -Math.PI / 2;
     centerPattern.position.set(loungeX, 0.005, loungeZ);
     scene.add(centerPattern);
-    
+
     // Gold trim lines
     [[-1.7, 0], [1.7, 0]].forEach(([dx, dz]) => {
         const trim = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 2.6), rugGoldMat);
@@ -1655,39 +1774,39 @@ function createFireplaceLounge() {
         trim.position.set(loungeX + dx, 0.006, loungeZ + dz);
         scene.add(trim);
     });
-    
+
     // === ARMCHAIRS ===
     // Chair facing fireplace (angled)
     createLoungeChair(loungeX + 1.2, 0, loungeZ - 0.5, -Math.PI * 0.15);
-    
+
     // Chair opposite (angled toward fireplace)
     createLoungeChair(loungeX - 1.2, 0, loungeZ + 0.5, Math.PI * 0.85);
-    
+
     // === SMALL SIDE TABLE between chairs ===
     const tableMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodLight, roughness: 0.5 });
     const sideTableTop = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.04, 16), tableMat);
     sideTableTop.position.set(loungeX, 0.55, loungeZ);
     sideTableTop.castShadow = true;
     scene.add(sideTableTop);
-    
+
     const sideTableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.53, 12), tableMat);
     sideTableLeg.position.set(loungeX, 0.265, loungeZ);
     scene.add(sideTableLeg);
-    
+
     addCollider(loungeX, 0.3, loungeZ, 0.6, 0.6, 0.6);
-    
+
     // Items on side table
     // Tea cup
     const cupMat = new THREE.MeshStandardMaterial({ color: 0xddd8d0, roughness: 0.3 });
     const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.035, 0.06, 12), cupMat);
     cup.position.set(loungeX - 0.08, 0.6, loungeZ + 0.05);
     scene.add(cup);
-    
+
     // Saucer
     const saucer = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.01, 12), cupMat);
     saucer.position.set(loungeX - 0.08, 0.575, loungeZ + 0.05);
     scene.add(saucer);
-    
+
     // Small book on table
     const tableBook = new THREE.Mesh(
         new THREE.BoxGeometry(0.12, 0.025, 0.16),
@@ -1696,15 +1815,15 @@ function createFireplaceLounge() {
     tableBook.position.set(loungeX + 0.08, 0.585, loungeZ - 0.05);
     tableBook.rotation.y = 0.3;
     scene.add(tableBook);
-    
+
     // === BOOK STACKS on floor ===
     createBookStack(loungeX - 1.5, 0, loungeZ - 1, 5, 0.2);
     createBookStack(loungeX + 1.6, 0, loungeZ + 0.8, 4, -0.15);
     createBookStack(loungeX - 0.3, 0, loungeZ + 1.3, 3, 0.4);
-    
+
     // === THROW BLANKET draped over chair arm ===
-    const blanketMat = new THREE.MeshStandardMaterial({ 
-        color: 0x2a4a3a, 
+    const blanketMat = new THREE.MeshStandardMaterial({
+        color: 0x2a4a3a,
         roughness: 0.95,
         side: THREE.DoubleSide
     });
@@ -1712,30 +1831,30 @@ function createFireplaceLounge() {
     blanket.position.set(loungeX + 1.55, 0.6, loungeZ - 0.5);
     blanket.rotation.set(-0.3, 0.2, 0.5);
     scene.add(blanket);
-    
+
     // === RUNE STONES near hearth (decorative magic elements) ===
     createRuneStones(loungeX + 1.8, 0.01, loungeZ - 1.2);
 }
 
 function createLoungeChair(x, y, z, rotY) {
     const group = new THREE.Group();
-    
+
     const leatherMat = new THREE.MeshStandardMaterial({ color: 0x3a1a0a, roughness: 0.7 });
     const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium, roughness: 0.6 });
-    
+
     // Seat cushion (larger, more comfortable looking)
     const seat = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.18, 0.7), leatherMat);
     seat.position.set(0, 0.42, 0);
     seat.castShadow = true;
     group.add(seat);
-    
+
     // Back cushion (high back, winged)
     const back = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.15), leatherMat);
     back.position.set(0, 0.9, -0.28);
     back.rotation.x = 0.08;
     back.castShadow = true;
     group.add(back);
-    
+
     // Wing sides
     [-0.4, 0.4].forEach(dx => {
         const wing = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.6, 0.4), leatherMat);
@@ -1743,26 +1862,26 @@ function createLoungeChair(x, y, z, rotY) {
         wing.rotation.y = dx > 0 ? -0.2 : 0.2;
         group.add(wing);
     });
-    
+
     // Armrests
     [-0.42, 0.42].forEach(dx => {
         const arm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.6), leatherMat);
         arm.position.set(dx, 0.58, 0);
         group.add(arm);
-        
+
         // Arm supports
         const support = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.25, 0.08), woodMat);
         support.position.set(dx, 0.45, 0.25);
         group.add(support);
     });
-    
+
     // Wooden legs
     const legGeo = new THREE.SphereGeometry(0.05, 8, 8);
     [[-0.32, -0.28], [-0.32, 0.28], [0.32, -0.28], [0.32, 0.28]].forEach(([lx, lz]) => {
         const leg = new THREE.Mesh(legGeo, woodMat);
         leg.position.set(lx, 0.05, lz);
         group.add(leg);
-        
+
         const legPost = new THREE.Mesh(
             new THREE.CylinderGeometry(0.035, 0.04, 0.25, 8),
             woodMat
@@ -1770,11 +1889,11 @@ function createLoungeChair(x, y, z, rotY) {
         legPost.position.set(lx, 0.2, lz);
         group.add(legPost);
     });
-    
+
     group.position.set(x, y, z);
     group.rotation.y = rotY;
     scene.add(group);
-    
+
     addCollider(x, y + 0.5, z, 1, 1.4, 0.9);
 }
 
@@ -1783,12 +1902,12 @@ function createBookStack(x, y, z, count, rotation) {
         const width = 0.18 + Math.random() * 0.08;
         const height = 0.025 + Math.random() * 0.015;
         const depth = 0.25 + Math.random() * 0.08;
-        
-        const bookMat = new THREE.MeshStandardMaterial({ 
+
+        const bookMat = new THREE.MeshStandardMaterial({
             color: CONFIG.books.colorsSpine[Math.floor(Math.random() * CONFIG.books.colorsSpine.length)],
             roughness: 0.85
         });
-        
+
         const book = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), bookMat);
         book.position.set(
             x + (Math.random() - 0.5) * 0.05,
@@ -1803,12 +1922,12 @@ function createBookStack(x, y, z, count, rotation) {
 
 function createRuneStones(x, y, z) {
     const runeMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.8 });
-    const glowMat = new THREE.MeshBasicMaterial({ 
-        color: 0xffaa44, 
-        transparent: true, 
-        opacity: 0.3 
+    const glowMat = new THREE.MeshBasicMaterial({
+        color: 0xffaa44,
+        transparent: true,
+        opacity: 0.3
     });
-    
+
     // Small arrangement of rune stones
     const stonePositions = [
         { dx: 0, dz: 0, size: 0.06 },
@@ -1816,7 +1935,7 @@ function createRuneStones(x, y, z) {
         { dx: -0.08, dz: 0.1, size: 0.05 },
         { dx: 0.05, dz: -0.08, size: 0.035 }
     ];
-    
+
     stonePositions.forEach(stone => {
         // Stone
         const stoneMesh = new THREE.Mesh(
@@ -1827,7 +1946,7 @@ function createRuneStones(x, y, z) {
         stoneMesh.rotation.set(Math.random(), Math.random(), Math.random());
         stoneMesh.castShadow = true;
         scene.add(stoneMesh);
-        
+
         // Subtle glow on some stones
         if (Math.random() > 0.5) {
             const glow = new THREE.Mesh(
@@ -1844,64 +1963,64 @@ function createRuneStones(x, y, z) {
 function createArmchair(x, y, z) {
     const chairMat = new THREE.MeshStandardMaterial({ color: 0x4a2515, roughness: 0.8 });
     const woodMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.woodMedium });
-    
+
     const seat = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.6), chairMat);
     seat.position.set(x, y + 0.4, z);
     seat.castShadow = true;
     scene.add(seat);
-    
+
     const back = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.12), chairMat);
     back.position.set(x, y + 0.85, z - 0.25);
     back.castShadow = true;
     scene.add(back);
-    
+
     [-0.38, 0.38].forEach(dx => {
         const arm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.25, 0.5), chairMat);
         arm.position.set(x + dx, y + 0.55, z);
         scene.add(arm);
     });
-    
+
     const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.35, 8);
     [[-0.28, -0.22], [-0.28, 0.22], [0.28, -0.22], [0.28, 0.22]].forEach(([dx, dz]) => {
         const leg = new THREE.Mesh(legGeo, woodMat);
         leg.position.set(x + dx, y + 0.175, z + dz);
         scene.add(leg);
     });
-    
+
     addCollider(x, y + 0.5, z, 0.9, 1.2, 0.8);
 }
 
 function createCandelabra(x, y, z) {
     const brassMat = new THREE.MeshStandardMaterial({ color: 0xb8860b, metalness: 0.6, roughness: 0.3 });
-    
+
     const base = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.05, 16), brassMat);
     base.position.set(x, y + 0.025, z);
     scene.add(base);
-    
+
     const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 0.2, 8), brassMat);
     stem.position.set(x, y + 0.15, z);
     scene.add(stem);
-    
+
     [-0.08, 0, 0.08].forEach((dx, i) => {
         const candleY = y + 0.25 + (i === 1 ? 0.05 : 0);
-        
+
         if (i !== 1) {
             const arm = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.02), brassMat);
-            arm.position.set(x + dx/2, y + 0.22, z);
+            arm.position.set(x + dx / 2, y + 0.22, z);
             scene.add(arm);
         }
-        
+
         const holder = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.03, 8), brassMat);
         holder.position.set(x + dx, candleY, z);
         scene.add(holder);
-        
+
         const candle = new THREE.Mesh(
             new THREE.CylinderGeometry(0.015, 0.018, 0.08, 8),
             new THREE.MeshStandardMaterial({ color: 0xf5e6d3 })
         );
         candle.position.set(x + dx, candleY + 0.055, z);
         scene.add(candle);
-        
+
         const flame = new THREE.Mesh(
             new THREE.SphereGeometry(0.012, 8, 8),
             new THREE.MeshBasicMaterial({ color: 0xffaa44 })
@@ -1918,7 +2037,7 @@ function createCandelabra(x, y, z) {
 function createFloatingCandles() {
     // Floating candles - OPTIMIZED for performance
     // Reduced count, fewer lights
-    
+
     // Main cluster above center (reduced from 15 to 6)
     for (let i = 0; i < 6; i++) {
         const fx = (Math.random() - 0.5) * 10;
@@ -1926,7 +2045,7 @@ function createFloatingCandles() {
         const fz = (Math.random() - 0.5) * 8;
         createFloatingCandle(fx, fy, fz);
     }
-    
+
     // Cluster above desk area (reduced from 8 to 3)
     for (let i = 0; i < 3; i++) {
         const fx = (Math.random() - 0.5) * 3;
@@ -1934,18 +2053,18 @@ function createFloatingCandles() {
         const fz = -3 + (Math.random() - 0.5) * 2;
         createFloatingCandle(fx, fy, fz);
     }
-    
+
     // One central chandelier
     createGrandChandelier(0, 8, -1);
-    
+
     // Wall sconces directly on walls (adjusted positions)
     const w = CONFIG.room.width;
     const d = CONFIG.room.depth;
-    createWallSconce(-w/2 + 0.15, 3, -1, Math.PI/2);   // Left wall
-    createWallSconce(w/2 - 0.15, 3, -1, -Math.PI/2);   // Right wall
-    createWallSconce(-4, 3, -d/2 + 0.15, 0);           // Front wall left
-    createWallSconce(4, 3, -d/2 + 0.15, 0);            // Front wall right
-    
+    createWallSconce(-w / 2 + 0.15, 3, -1, Math.PI / 2);   // Left wall
+    createWallSconce(w / 2 - 0.15, 3, -1, -Math.PI / 2);   // Right wall
+    createWallSconce(-4, 3, -d / 2 + 0.15, 0);           // Front wall left
+    createWallSconce(4, 3, -d / 2 + 0.15, 0);            // Front wall right
+
     // One magical candle near orb
     createMagicalCandle(0.5, 2.5, -2.5);
 }
@@ -1953,12 +2072,12 @@ function createFloatingCandles() {
 // Single floating candle - NO individual lights for performance
 function createFloatingCandle(x, y, z) {
     const candleMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e6, roughness: 0.3 });
-    const flameMat = new THREE.MeshStandardMaterial({ 
-        color: 0xffaa33, 
-        emissive: 0xff6600, 
+    const flameMat = new THREE.MeshStandardMaterial({
+        color: 0xffaa33,
+        emissive: 0xff6600,
         emissiveIntensity: 1.2  // Brighter emissive to compensate for no light
     });
-    
+
     // Candle body (tall and thin)
     const candleHeight = 0.15 + Math.random() * 0.1;
     const candle = new THREE.Mesh(
@@ -1967,29 +2086,29 @@ function createFloatingCandle(x, y, z) {
     );
     candle.position.set(x, y, z);
     scene.add(candle);
-    
+
     // Flame with bright emissive (no point light needed)
     const flame = new THREE.Mesh(
         new THREE.ConeGeometry(0.012, 0.04, 6),  // Reduced segments
         flameMat
     );
-    flame.position.set(x, y + candleHeight/2 + 0.02, z);
+    flame.position.set(x, y + candleHeight / 2 + 0.02, z);
     scene.add(flame);
     // NO point light - emissive material provides glow effect
 }
 
 function createGrandChandelier(x, y, z) {
-    const metalMat = new THREE.MeshStandardMaterial({ 
-        color: 0x8b7355, 
-        metalness: 0.7, 
-        roughness: 0.3 
+    const metalMat = new THREE.MeshStandardMaterial({
+        color: 0x8b7355,
+        metalness: 0.7,
+        roughness: 0.3
     });
-    const goldMat = new THREE.MeshStandardMaterial({ 
-        color: 0xc9a227, 
-        metalness: 0.8, 
-        roughness: 0.2 
+    const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xc9a227,
+        metalness: 0.8,
+        roughness: 0.2
     });
-    
+
     // Simplified chain (cylinder instead of individual links)
     const chain = new THREE.Mesh(
         new THREE.CylinderGeometry(0.02, 0.02, 2.5, 6),
@@ -1997,7 +2116,7 @@ function createGrandChandelier(x, y, z) {
     );
     chain.position.set(x, CONFIG.room.height - 1.5, z);
     scene.add(chain);
-    
+
     // Central hub (reduced segments)
     const hub = new THREE.Mesh(
         new THREE.SphereGeometry(0.15, 8, 8),
@@ -2005,7 +2124,7 @@ function createGrandChandelier(x, y, z) {
     );
     hub.position.set(x, y + 0.3, z);
     scene.add(hub);
-    
+
     // Main ring (reduced segments)
     const ring = new THREE.Mesh(
         new THREE.TorusGeometry(0.8, 0.04, 8, 16),
@@ -2014,7 +2133,7 @@ function createGrandChandelier(x, y, z) {
     ring.position.set(x, y, z);
     ring.rotation.x = Math.PI / 2;
     scene.add(ring);
-    
+
     // Inner ring
     const innerRing = new THREE.Mesh(
         new THREE.TorusGeometry(0.4, 0.03, 12, 24),
@@ -2023,7 +2142,7 @@ function createGrandChandelier(x, y, z) {
     innerRing.position.set(x, y - 0.1, z);
     innerRing.rotation.x = Math.PI / 2;
     scene.add(innerRing);
-    
+
     // Connecting spokes
     for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
@@ -2040,13 +2159,13 @@ function createGrandChandelier(x, y, z) {
         spoke.rotation.y = angle;
         scene.add(spoke);
     }
-    
+
     // Candles on outer ring (8 candles)
     for (let i = 0; i < 8; i++) {
         const angle = (i / 8) * Math.PI * 2;
         const cx = x + Math.cos(angle) * 0.75;
         const cz = z + Math.sin(angle) * 0.75;
-        
+
         // Candle holder
         const holder = new THREE.Mesh(
             new THREE.CylinderGeometry(0.04, 0.05, 0.04, 12),
@@ -2054,7 +2173,7 @@ function createGrandChandelier(x, y, z) {
         );
         holder.position.set(cx, y - 0.02, cz);
         scene.add(holder);
-        
+
         // Candle
         const candle = new THREE.Mesh(
             new THREE.CylinderGeometry(0.025, 0.03, 0.12, 8),
@@ -2062,7 +2181,7 @@ function createGrandChandelier(x, y, z) {
         );
         candle.position.set(cx, y + 0.06, cz);
         scene.add(candle);
-        
+
         // Flame
         const flame = new THREE.Mesh(
             new THREE.ConeGeometry(0.015, 0.04, 8),
@@ -2070,7 +2189,7 @@ function createGrandChandelier(x, y, z) {
         );
         flame.position.set(cx, y + 0.14, cz);
         scene.add(flame);
-        
+
         floatingCandles.push({
             mesh: candle,
             flame: flame,
@@ -2078,27 +2197,27 @@ function createGrandChandelier(x, y, z) {
             phase: i * 0.5
         });
     }
-    
+
     // Candles on inner ring (4 candles)
     for (let i = 0; i < 4; i++) {
         const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
         const cx = x + Math.cos(angle) * 0.35;
         const cz = z + Math.sin(angle) * 0.35;
-        
+
         const candle = new THREE.Mesh(
             new THREE.CylinderGeometry(0.02, 0.025, 0.1, 8),
             new THREE.MeshStandardMaterial({ color: 0xf5e6d3 })
         );
         candle.position.set(cx, y - 0.05, cz);
         scene.add(candle);
-        
+
         const flame = new THREE.Mesh(
             new THREE.ConeGeometry(0.012, 0.035, 8),
             new THREE.MeshBasicMaterial({ color: 0xffaa33 })
         );
         flame.position.set(cx, y + 0.02, cz);
         scene.add(flame);
-        
+
         floatingCandles.push({
             mesh: candle,
             flame: flame,
@@ -2106,7 +2225,7 @@ function createGrandChandelier(x, y, z) {
             phase: i * 0.7 + 2
         });
     }
-    
+
     // Central chandelier light
     const chandelierLight = new THREE.PointLight(0xff9944, 1.5, 12);
     chandelierLight.position.set(x, y - 0.2, z);
@@ -2117,12 +2236,12 @@ function createGrandChandelier(x, y, z) {
 }
 
 function createSmallChandelier(x, y, z) {
-    const metalMat = new THREE.MeshStandardMaterial({ 
-        color: 0x6b5344, 
-        metalness: 0.6, 
-        roughness: 0.4 
+    const metalMat = new THREE.MeshStandardMaterial({
+        color: 0x6b5344,
+        metalness: 0.6,
+        roughness: 0.4
     });
-    
+
     // Chain
     for (let i = 0; i < 5; i++) {
         const link = new THREE.Mesh(
@@ -2133,7 +2252,7 @@ function createSmallChandelier(x, y, z) {
         link.rotation.x = i % 2 === 0 ? 0 : Math.PI / 2;
         scene.add(link);
     }
-    
+
     // Simple ring
     const ring = new THREE.Mesh(
         new THREE.TorusGeometry(0.35, 0.025, 10, 20),
@@ -2142,27 +2261,27 @@ function createSmallChandelier(x, y, z) {
     ring.position.set(x, y, z);
     ring.rotation.x = Math.PI / 2;
     scene.add(ring);
-    
+
     // 5 candles
     for (let i = 0; i < 5; i++) {
         const angle = (i / 5) * Math.PI * 2;
         const cx = x + Math.cos(angle) * 0.32;
         const cz = z + Math.sin(angle) * 0.32;
-        
+
         const candle = new THREE.Mesh(
             new THREE.CylinderGeometry(0.02, 0.025, 0.1, 8),
             new THREE.MeshStandardMaterial({ color: 0xf5e6d3 })
         );
         candle.position.set(cx, y + 0.05, cz);
         scene.add(candle);
-        
+
         const flame = new THREE.Mesh(
             new THREE.ConeGeometry(0.012, 0.03, 8),
             new THREE.MeshBasicMaterial({ color: 0xffaa33 })
         );
         flame.position.set(cx, y + 0.12, cz);
         scene.add(flame);
-        
+
         floatingCandles.push({
             mesh: candle,
             flame: flame,
@@ -2170,7 +2289,7 @@ function createSmallChandelier(x, y, z) {
             phase: i * 0.6 + x
         });
     }
-    
+
     // Light
     const light = new THREE.PointLight(0xff9944, 0.6, 6);
     light.position.set(x, y, z);
@@ -2178,15 +2297,15 @@ function createSmallChandelier(x, y, z) {
 }
 
 function createWallSconce(x, y, z, rotY) {
-    const metalMat = new THREE.MeshStandardMaterial({ 
-        color: 0x6b5344, 
-        metalness: 0.5, 
-        roughness: 0.5 
+    const metalMat = new THREE.MeshStandardMaterial({
+        color: 0x6b5344,
+        metalness: 0.5,
+        roughness: 0.5
     });
-    
+
     const group = new THREE.Group();
     group.rotation.y = rotY;
-    
+
     // Wall plate
     const plate = new THREE.Mesh(
         new THREE.BoxGeometry(0.12, 0.2, 0.03),
@@ -2194,7 +2313,7 @@ function createWallSconce(x, y, z, rotY) {
     );
     plate.position.set(0, 0, 0);
     group.add(plate);
-    
+
     // Arm extending from wall
     const arm = new THREE.Mesh(
         new THREE.BoxGeometry(0.04, 0.04, 0.2),
@@ -2202,7 +2321,7 @@ function createWallSconce(x, y, z, rotY) {
     );
     arm.position.set(0, 0, 0.12);
     group.add(arm);
-    
+
     // Candle holder cup
     const cup = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.03, 0.04, 12),
@@ -2210,7 +2329,7 @@ function createWallSconce(x, y, z, rotY) {
     );
     cup.position.set(0, 0.02, 0.22);
     group.add(cup);
-    
+
     // Candle
     const candle = new THREE.Mesh(
         new THREE.CylinderGeometry(0.025, 0.03, 0.15, 8),
@@ -2218,7 +2337,7 @@ function createWallSconce(x, y, z, rotY) {
     );
     candle.position.set(0, 0.11, 0.22);
     group.add(candle);
-    
+
     // Flame
     const flame = new THREE.Mesh(
         new THREE.ConeGeometry(0.015, 0.04, 8),
@@ -2226,17 +2345,17 @@ function createWallSconce(x, y, z, rotY) {
     );
     flame.position.set(0, 0.2, 0.22);
     group.add(flame);
-    
+
     group.position.set(x, y, z);
     scene.add(group);
-    
+
     // Light
     const light = new THREE.PointLight(0xff8833, 0.4, 4);
     const worldPos = new THREE.Vector3(0, 0.15, 0.25);
     worldPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotY);
     light.position.set(x + worldPos.x, y + worldPos.y, z + worldPos.z);
     scene.add(light);
-    
+
     floatingCandles.push({
         mesh: candle,
         flame: flame,
@@ -2254,7 +2373,7 @@ function createMagicalCandle(x, y, z) {
     candle.position.set(x, y, z);
     candle.castShadow = true;
     scene.add(candle);
-    
+
     // Flame
     const flame = new THREE.Mesh(
         new THREE.ConeGeometry(0.015, 0.04, 8),
@@ -2262,13 +2381,13 @@ function createMagicalCandle(x, y, z) {
     );
     flame.position.set(x, y + 0.08, z);
     scene.add(flame);
-    
+
     // Magical glow ring around candle (visible magical support)
     const magicRing = new THREE.Mesh(
         new THREE.TorusGeometry(0.08, 0.008, 8, 16),
-        new THREE.MeshBasicMaterial({ 
-            color: 0x88aaff, 
-            transparent: true, 
+        new THREE.MeshBasicMaterial({
+            color: 0x88aaff,
+            transparent: true,
             opacity: 0.4,
             blending: THREE.AdditiveBlending
         })
@@ -2276,7 +2395,7 @@ function createMagicalCandle(x, y, z) {
     magicRing.position.set(x, y - 0.02, z);
     magicRing.rotation.x = Math.PI / 2;
     scene.add(magicRing);
-    
+
     // Subtle particles/sparkles around the candle
     const sparkleGeo = new THREE.BufferGeometry();
     const sparkleCount = 8;
@@ -2289,7 +2408,7 @@ function createMagicalCandle(x, y, z) {
         positions[i * 3 + 2] = Math.sin(angle) * radius;
     }
     sparkleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    
+
     const sparkles = new THREE.Points(sparkleGeo, new THREE.PointsMaterial({
         color: 0xaabbff,
         size: 0.02,
@@ -2299,12 +2418,12 @@ function createMagicalCandle(x, y, z) {
     }));
     sparkles.position.set(x, y, z);
     scene.add(sparkles);
-    
+
     // Light
     const glow = new THREE.PointLight(0xff8833, 0.3, 2);
     glow.position.set(x, y + 0.05, z);
     scene.add(glow);
-    
+
     floatingCandles.push({
         mesh: candle,
         flame: flame,
