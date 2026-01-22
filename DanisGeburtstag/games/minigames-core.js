@@ -44,6 +44,11 @@ function closeMinigame(minigameNum) {
         modal.classList.remove('active');
         const mainLibrary = document.getElementById('mainLibrary');
         if (mainLibrary) mainLibrary.classList.remove('dimmed');
+
+        // Trigger game-specific close logic
+        if (typeof window.onMinigameClosed === 'function') {
+            window.onMinigameClosed(minigameNum);
+        }
     }
 }
 

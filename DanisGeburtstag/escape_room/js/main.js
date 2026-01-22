@@ -167,12 +167,21 @@ function animate() {
 function startGame() {
     document.getElementById('introOverlay').classList.add('hidden');
     gameStarted = true;
-    
+
+    // Automatische Pointer Lock Aktivierung beim Spielstart
     setTimeout(() => {
-        interactionPrompt.innerHTML = 'Klicke um die Maussteuerung zu aktivieren';
-        interactionPrompt.classList.add('visible');
-        setTimeout(() => interactionPrompt.classList.remove('visible'), 3000);
-    }, 500);
+        const canvas = document.getElementById('game-canvas');
+        if (canvas && !document.pointerLockElement) {
+            // Simuliere einen Klick auf das Canvas für Pointer Lock
+            const clickEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                clientX: canvas.offsetWidth / 2,
+                clientY: canvas.offsetHeight / 2
+            });
+            canvas.dispatchEvent(clickEvent);
+        }
+    }, 500); // Nach dem Intro-Overlay verschwunden ist
 }
 
 // ============================================================================
@@ -203,14 +212,25 @@ window.addEventListener('load', () => {
         }
     };
     
-    // Override closeMinigame
-    window.closeMinigame = function(num) {
-        const modal = document.getElementById('minigame' + num);
-        if (modal) {
-            modal.classList.remove('active');
-            modal.style.display = 'none';
-        }
+    // Game-specific minigame close handler
+    window.onMinigameClosed = function(num) {
+        // Set game state
         isMinigameOpen = false;
+
+        // Automatische Pointer Lock Reaktivierung nach Minigame-Ende
+        setTimeout(() => {
+            const canvas = document.getElementById('game-canvas');
+            if (canvas && !document.pointerLockElement) {
+                // Simuliere einen Klick auf das Canvas für Pointer Lock
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: canvas.offsetWidth / 2,
+                    clientY: canvas.offsetHeight / 2
+                });
+                canvas.dispatchEvent(clickEvent);
+            }
+        }, 100); // Kleiner Delay um sicherzustellen, dass Modal geschlossen ist
     };
     
     // Add click handlers to close buttons
