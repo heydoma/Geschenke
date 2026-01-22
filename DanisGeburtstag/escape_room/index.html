@@ -312,8 +312,8 @@
     </div>
 
     <!-- Marauder's Map Modal -->
-    <div class="minigame-modal" id="maraudersMapModal" style="display: none;">
-        <div class="modal-content" style="max-width: 800px; background: #1a1208; border: 3px solid #8b7355;">
+    <div class="minigame-modal" id="maraudersMapModal" style="display: none; background: transparent; box-shadow: none;">
+        <div class="modal-content marauders-parchment-holder" style="max-width: 800px; background: transparent; border: none; box-shadow: none; padding: 0; position: relative;">
             <div class="modal-header">
                 <h2 class="modal-title" style="font-family: 'Palatino', serif; letter-spacing: 2px;">🗺️ Die Karte des
                     Rumtreibers</h2>
@@ -322,39 +322,14 @@
                 </div>
             </div>
             <div class="modal-body" style="padding: 0;">
-                <div id="mapContainer" style="
-                position: relative;
-                width: 100%;
-                max-width: 750px;
-                margin: 0 auto;
-                background: #d4c4a8;
-                border: 8px solid #8b7355;
-                border-radius: 4px;
-                box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 10px 40px rgba(0,0,0,0.5);
-                overflow: hidden;
-            ">
+                <div class="parchment-holder-wood">
+                  <div class="parchment-holder-shadow"></div>
+                  <div id="mapContainer" class="parchment-on-wood">
                     <!-- Parchment texture overlay -->
-                    <div style="
-                    position: absolute;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background: repeating-linear-gradient(
-                        0deg,
-                        transparent,
-                        transparent 2px,
-                        rgba(139,115,85,0.03) 2px,
-                        rgba(139,115,85,0.03) 4px
-                    );
-                    pointer-events: none;
-                    z-index: 5;
-                "></div>
+                    <div class="parchment-texture-overlay"></div>
 
                     <!-- Map image -->
-                    <img src="karte.png" alt="Karte" style="
-                    width: 100%;
-                    display: block;
-                    filter: sepia(0.5) contrast(0.8) brightness(0.6);
-                    transition: filter 1s ease;
-                " id="mapImage">
+                    <img src="karte.png" alt="Karte" id="mapImage" class="map-image">
 
                     <!-- LOCKED MESSAGE (before all puzzles solved) -->
                     <div id="mapLockedMessage" style="
@@ -441,7 +416,8 @@
                     z-index: 11;
                     transition: opacity 0.3s;
                 ">Dani</div>
-                </div>
+                                    </div>
+                                </div>
 
                 <!-- Map title text -->
                 <div style="

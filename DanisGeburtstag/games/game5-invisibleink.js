@@ -295,8 +295,11 @@ const invisibleInk = (() => {
         }
         
         setTimeout(() => {
-            if (typeof solveMinigame === 'function') {
-                solveMinigame(5, '△ Heiligtümer');
+            if (typeof window.solveMinigame === 'function') {
+                window.solveMinigame(5, '△ Heiligtümer');
+            }
+            if (typeof window.closeMinigame === 'function') {
+                window.closeMinigame(5);
             }
         }, 1500);
     }

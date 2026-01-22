@@ -149,7 +149,7 @@ const polyjuiceGame = (() => {
         }
 
         state = 'checking';
-        checkBtn.disabled = true;
+        if (checkBtn) checkBtn.disabled = true;
 
         // Check if solution is correct
         const isCorrect = Object.keys(SOLUTION).every(

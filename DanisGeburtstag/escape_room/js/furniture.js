@@ -506,6 +506,7 @@ function createRuneDesk() {
     rolledParchment.position.set(x - 0.6, 0.85, z + 0.2);
     scene.add(rolledParchment);
     
+
     // Small candle for reading
     const candleHolder = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.05, 0.03, 12),
@@ -513,14 +514,14 @@ function createRuneDesk() {
     );
     candleHolder.position.set(x - 0.5, 0.83, z - 0.3);
     scene.add(candleHolder);
-    
+
     const candle = new THREE.Mesh(
         new THREE.CylinderGeometry(0.015, 0.02, 0.12, 8),
         new THREE.MeshStandardMaterial({ color: 0xf5f0e6 })
     );
     candle.position.set(x - 0.5, 0.92, z - 0.3);
     scene.add(candle);
-    
+
     // Candle flame
     const flame = new THREE.Mesh(
         new THREE.ConeGeometry(0.01, 0.03, 8),
@@ -528,21 +529,37 @@ function createRuneDesk() {
     );
     flame.position.set(x - 0.5, 1.0, z - 0.3);
     scene.add(flame);
-    
+
     // Small light from candle
     const candleLight = new THREE.PointLight(0xff9944, 0.3, 2);
     candleLight.position.set(x - 0.5, 1.0, z - 0.3);
     scene.add(candleLight);
-    
+
     // Interactive zone for rune puzzle
     const interactZone = new THREE.Mesh(
         new THREE.BoxGeometry(1, 1, 1),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    interactZone.position.set(x, 0.9, z);
-    interactZone.userData = { type: 'desk', ...CONFIG.interactives.desk };
+    interactZone.position.set(x, 0.4, z);
+    interactZone.userData = { type: 'runeDesk', ...CONFIG.interactives.runeDesk };
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
+
+    // Interactive zone for mystical glow game (game 5) on the floating candle above the desk (fireplace mantle)
+    // The floating candles are at (wallX + 1.0, 3.48, centerZ + dz) in createFireplace
+    // We'll use the left candle (dz = -1.0)
+    const roomWidth = CONFIG.room.width;
+    const wallX = -roomWidth/2;
+    const centerZ = 0;
+    const dz = -1.0; // left floating candle
+    const fireGameZone = new THREE.Mesh(
+        new THREE.BoxGeometry(0.18, 0.18, 0.18),
+        new THREE.MeshBasicMaterial({ visible: false })
+    );
+    fireGameZone.position.set(wallX + 1.0, 3.25, centerZ + dz); // lower, closer to player
+    fireGameZone.userData = { type: 'game5', hint: 'Was passiert wohl, wenn man die schwebende Kerze untersucht?', game: 5 };
+    interactiveObjects.push(fireGameZone);
+    scene.add(fireGameZone);
 }
 
 // ============================================================================
@@ -558,88 +575,107 @@ let magicMapElements = {
 };
 
 function createMagicMap(x, y, z) {
-    // === SIMPLE PARCHMENT MAP ===
-    // Clean, simple design - the detailed map is shown in the modal
-    
+    // === IMMERSIVE 3D MARAUDER'S MAP ON WOODEN HOLDER ===
+    // Wooden stand base
+    const standMat = new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.7 });
+    const standBase = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.08, 18), standMat);
+    standBase.position.set(x, y, z);
+    standBase.rotation.y = Math.PI;
+    standBase.castShadow = true;
+    scene.add(standBase);
+
+    // Stand column
+    const standCol = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.38, 14), standMat);
+    standCol.position.set(x, y + 0.19, z);
+    standCol.rotation.y = Math.PI;
+    standCol.castShadow = true;
+    scene.add(standCol);
+
+    // Slanted wooden holder (top)
+    const holderMat = new THREE.MeshStandardMaterial({ color: 0x6a4a2a, roughness: 0.6 });
+    const holder = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.04, 0.38), holderMat);
+    holder.position.set(x, y + 0.39, z);
+    holder.rotation.x = Math.PI / 9; // ~+20° slant (tilt toward player)
+    holder.rotation.y = Math.PI;
+    holder.castShadow = true;
+    scene.add(holder);
+
+    // Parchment (map) on top of holder
     const parchmentMat = new THREE.MeshStandardMaterial({ 
-        color: 0xd4c4a8, 
-        roughness: 0.85,
-        side: THREE.DoubleSide
+        color: 0xe7d7b1, 
+        roughness: 0.82,
+        side: THREE.DoubleSide,
+        map: null
     });
-    
-    // Main parchment - slightly rolled edges effect
+    // Optionally, add a parchment texture here if available
     const parchment = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.5, 0.35),
+        new THREE.PlaneGeometry(0.56, 0.34),
         parchmentMat
     );
-    parchment.position.set(x, y + 0.005, z);
-    parchment.rotation.x = -Math.PI / 2;
-    parchment.rotation.z = 0.05;
+    parchment.position.set(x, y + 0.415, z + 0.01);
+    parchment.rotation.x = Math.PI / 1.65; // 90°: sits optimal on the slanted holder
+    parchment.rotation.z = 0;
+    parchment.castShadow = true;
     scene.add(parchment);
     magicMapElements.parchment = parchment;
-    
-    // Rolled edge on left side
+
+    // Rolled edges (left and right)
     const rollMat = new THREE.MeshStandardMaterial({ color: 0xc4b498, roughness: 0.8 });
     const leftRoll = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.02, 0.02, 0.36, 8),
+        new THREE.CylinderGeometry(0.018, 0.018, 0.34, 10),
         rollMat
     );
-    leftRoll.position.set(x - 0.26, y + 0.015, z);
-    leftRoll.rotation.x = Math.PI / 2;
+    leftRoll.position.set(x - 0.28, y + 0.415, z + 0.01);
+    leftRoll.rotation.x = Math.PI / 2 + Math.PI / 9;
     scene.add(leftRoll);
-    
-    // Rolled edge on right side (smaller, partially unrolled)
     const rightRoll = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.015, 0.015, 0.36, 8),
+        new THREE.CylinderGeometry(0.014, 0.014, 0.34, 10),
         rollMat
     );
-    rightRoll.position.set(x + 0.26, y + 0.012, z);
-    rightRoll.rotation.x = Math.PI / 2;
+    rightRoll.position.set(x + 0.28, y + 0.415, z + 0.01);
+    rightRoll.rotation.x = Math.PI / 2 + Math.PI / 9;
     scene.add(rightRoll);
-    
-    // Simple ink lines to suggest a floor plan
+
+    // Simple ink lines to suggest a floor plan (as before)
     const inkMat = new THREE.MeshBasicMaterial({ 
         color: 0x3a2a1a, 
         transparent: true, 
-        opacity: 0.5 
+        opacity: 0.85 
     });
-    
     // Outer rectangle (simple room outline)
     const outline = new THREE.Mesh(
         new THREE.RingGeometry(0.12, 0.13, 4),
         inkMat
     );
-    outline.position.set(x, y + 0.006, z);
-    outline.rotation.x = -Math.PI / 2;
+    outline.position.set(x, y + 0.435, z + 0.01); // slightly above the map
+    outline.rotation.x = Math.PI / 1.65;
     outline.rotation.z = Math.PI / 4;
     scene.add(outline);
-    
     // A few subtle lines
     [-0.08, 0, 0.08].forEach(dz => {
         const line = new THREE.Mesh(
             new THREE.PlaneGeometry(0.2, 0.004),
             inkMat
         );
-        line.position.set(x, y + 0.006, z + dz);
-        line.rotation.x = -Math.PI / 2;
+        line.position.set(x, y + 0.435, z + dz + 0.01); // slightly above the map
+        line.rotation.x = Math.PI / 1.65;
         scene.add(line);
     });
-    
     // Title area (decorative squiggle)
     const title = new THREE.Mesh(
         new THREE.PlaneGeometry(0.15, 0.02),
-        new THREE.MeshBasicMaterial({ color: 0x4a3a2a, transparent: true, opacity: 0.4 })
+        new THREE.MeshBasicMaterial({ color: 0x4a3a2a, transparent: true, opacity: 0.7 })
     );
-    title.position.set(x, y + 0.006, z + 0.13);
-    title.rotation.x = -Math.PI / 2;
+    title.position.set(x, y + 0.44, z + 0.13 + 0.01); // slightly above the map
+    title.rotation.x = Math.PI / 1.65;
     scene.add(title);
-    
-    // Interactive zone for the map
+
+    // Interactive zone for the map (unchanged)
     const mapInteract = new THREE.Mesh(
         new THREE.BoxGeometry(0.4, 0.25, 0.35),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    mapInteract.position.set(x, y + 0.15, z);
+    mapInteract.position.set(x, y + 0.25, z);
     mapInteract.userData = { 
         type: 'magicMap', 
         hint: 'Die Karte des Rumtreibers betrachten',
@@ -845,15 +881,8 @@ function createMagicOrb() {
     
     createOrbDustParticles(x, y + 0.27, z);
     
-    // Interactive zone
-    const interactZone = new THREE.Mesh(
-        new THREE.SphereGeometry(0.35, 8, 8),
-        new THREE.MeshBasicMaterial({ visible: false })
-    );
-    interactZone.position.set(x, y + 0.27, z);
-    interactZone.userData = { type: 'orb', ...CONFIG.interactives.orb };
-    interactiveObjects.push(interactZone);
-    scene.add(interactZone);
+    // Interactive zone for orb (if needed, but NOT for game5/leuchten)
+    // (game5 trigger is now on the floating candle above the desk)
 }
 
 // ============================================================================

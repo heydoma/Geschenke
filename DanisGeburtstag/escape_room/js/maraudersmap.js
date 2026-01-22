@@ -117,6 +117,7 @@ function startFootstepsAnimation() {
     // Adjust these values to match your karte.png layout!
   const path = [
     // Schlafzimmer (Start – mittig)
+    { x: 43, y: 65 },            
     { x: 45, y: 65 },
     { x: 48, y: 65 },
     { x: 51, y: 65 },
@@ -131,17 +132,22 @@ function startFootstepsAnimation() {
     { x: 60, y: 59 },
     { x: 60, y: 56 },
     { x: 60, y: 53 },
+    { x: 60, y: 50 },
+    { x: 60, y: 47 },
+    { x: 60, y: 44 },
 
     // Nach links ins Wohnzimmer
-    { x: 57, y: 53 },
-    { x: 54, y: 53 },
-    { x: 51, y: 53 },
-    { x: 48, y: 53 },
-    { x: 45, y: 53 },
+    { x: 57, y: 44 },
+    { x: 54, y: 44 },
+    { x: 51, y: 44 },
+    { x: 48, y: 44 },
+    { x: 45, y: 44 },
+    { x: 42, y: 44 },
 
     // Wohnzimmer (Ziel – leicht reinlaufen)
-    { x: 42, y: 53 },
-    { x: 40, y: 53 }
+    { x: 42, y: 44 },
+    { x: 40, y: 44 },
+    { x: 38, y: 44 }
     ];
 
     

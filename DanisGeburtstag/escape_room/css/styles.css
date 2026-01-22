@@ -1,3 +1,67 @@
+/* === MARAUDER'S MAP PARCHMENT HOLDER === */
+.marauders-parchment-holder {
+    perspective: 1200px;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+.parchment-holder-wood {
+    position: relative;
+    width: 780px;
+    margin: 40px auto 30px auto;
+    padding: 0;
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.parchment-holder-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    width: 92%;
+    height: 36px;
+    background: radial-gradient(ellipse at center, rgba(60,40,20,0.25) 0%, rgba(0,0,0,0.08) 80%, transparent 100%);
+    filter: blur(2px);
+    z-index: 1;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.parchment-on-wood {
+    position: relative;
+    width: 750px;
+    background: #e7d7b1;
+    border: 10px solid #8b7355;
+    border-radius: 10px 10px 18px 18px/12px 12px 30px 30px;
+    box-shadow: 0 12px 40px rgba(60,40,20,0.25), 0 2px 0 #bfa06a, 0 0 0 8px #bfa06a inset, 0 0 60px rgba(0,0,0,0.10) inset;
+    overflow: hidden;
+    transform: rotateX(14deg) skewX(-6deg);
+    z-index: 2;
+}
+
+.parchment-texture-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,115,85,0.04) 2px, rgba(139,115,85,0.04) 4px),
+                            url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.parchment-on-wood .map-image {
+    width: 100%;
+    display: block;
+    filter: sepia(0.5) contrast(0.8) brightness(0.7);
+    transition: filter 1s ease;
+    border-radius: 6px 6px 18px 18px/8px 8px 30px 30px;
+    box-shadow: 0 2px 18px rgba(60,40,20,0.10) inset;
+    position: relative;
+    z-index: 2;
+}
 /* ============================================================================
    ESCAPE ROOM - STYLES
    Die Verbotene Abteilung - Harry Potter Themed Escape Room

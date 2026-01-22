@@ -253,10 +253,10 @@ const bellGame = (() => {
             showMessage('🎵 Höre gut zu...', 'info');
         }
         
-        // Sequenz abspielen
+        // Sequenz abspielen (nur Ton, kein visuelles Highlight)
         sequence.forEach((bellIndex, i) => {
             setTimeout(() => {
-                highlightBell(bellIndex, 500);
+                playTone(bellIndex, 500); // Nur Ton, kein highlightBell
             }, i * delay + 500); // 500ms Pause vor Start
         });
         

@@ -245,20 +245,25 @@ window.addEventListener('load', () => {
     if (origSolve) {
         window.solveMinigame = function(num, artifact, number = null) {
             origSolve(num, artifact, number);
-            
+
             const gem = document.querySelector(`.progress-gem[data-game="${num}"]`);
             if (gem) gem.classList.add('active');
-            
+
             // === REVEAL MAP PATH for this puzzle ===
             if (typeof revealMapPath === 'function') {
                 revealMapPath(num);
             }
-            
+
+            // Immer prüfen, wie viele Spiele gelöst sind
             let solved = 0;
             for (let i = 1; i <= 7; i++) {
                 if (gameState.solved[i - 1]) solved++;
             }
-            
+
+            // Beispielaktion: Log oder Hinweis (optional)
+            // console.log(`Aktuell gelöst: ${solved}`);
+
+            // Wenn alle gelöst, Denkarium freischalten
             if (solved >= 7) {
                 const pensieve = interactiveObjects.find(o => o.userData.type === 'pensieve');
                 if (pensieve) {
