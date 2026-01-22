@@ -1178,9 +1178,12 @@ function createCauldronSteam(x, y, z) {
 }
 
 function createBells() {
-    // Position under fireplace mantle (left wall, inside fireplace area)
+    // Position exakt unter dem Kaminsims (Mantle)
     const w = CONFIG.room.width;
-    const x = -w/2 + 1.8, y = 2.6, z = 0;  // Under mantle, rotated to face into room
+    const wallX = -w/2;
+    const x = wallX + 0.8; // exakt unter mantle.position.x
+    const y = 2.8;         // noch etwas tiefer unter dem Sims
+    const z = 0;           // mittig im Raum
     
     const bellSizes = [0.08, 0.1, 0.12, 0.1, 0.08];
     const bellMat = new THREE.MeshStandardMaterial({ color: 0xd4a855, metalness: 0.7, roughness: 0.25 });
@@ -1188,17 +1191,28 @@ function createBells() {
     bellSizes.forEach((size, i) => {
         const bell = new THREE.Mesh(new THREE.ConeGeometry(size, size * 1.8, 16), bellMat);
         // Bells hang in a row along z axis (parallel to wall)
-        bell.position.set(x, y, z - 0.4 + i * 0.2);
+        const bellZ = z - 0.4 + i * 0.2;
+        bell.position.set(x, y, bellZ);
         bell.rotation.x = Math.PI;
         bell.castShadow = true;
         scene.add(bell);
-        
+
         const string = new THREE.Mesh(
             new THREE.CylinderGeometry(0.005, 0.005, 0.15, 8),
             new THREE.MeshBasicMaterial({ color: 0x5a4a3a })
         );
-        string.position.set(x, y + size * 1.8 / 2 + 0.075, z - 0.4 + i * 0.2);
+        string.position.set(x, y + size * 1.8 / 2 + 0.075, bellZ);
         scene.add(string);
+
+        // Unsichtbarer Test-Trigger für jede Glocke
+        const bellTestZone = new THREE.Mesh(
+            new THREE.BoxGeometry(0.12, 0.18, 0.12),
+            new THREE.MeshBasicMaterial({ visible: false })
+        );
+        bellTestZone.position.set(x, y - size * 0.7, bellZ);
+        bellTestZone.userData = { type: 'bellTest', bellIndex: i, hint: 'Glocke testen', playBell: i };
+        interactiveObjects.push(bellTestZone);
+        scene.add(bellTestZone);
     });
     
     const interactZone = new THREE.Mesh(
@@ -1329,8 +1343,6 @@ function createStairs() {
     // 5 small floating stair segments that rotate slowly
     for (let i = 0; i < 5; i++) {
         const segment = new THREE.Group();
-        
-        // Small staircase piece (3 steps)
         for (let s = 0; s < 3; s++) {
             const step = new THREE.Mesh(
                 new THREE.BoxGeometry(0.15, 0.03, 0.08),
@@ -1339,7 +1351,6 @@ function createStairs() {
             step.position.set(0, s * 0.04, s * 0.05);
             segment.add(step);
         }
-        
         // Position each segment floating around
         const angle = (i / 5) * Math.PI * 2;
         const radius = 0.4;
@@ -1350,7 +1361,6 @@ function createStairs() {
         );
         segment.rotation.y = angle + Math.PI / 2;
         segment.rotation.x = Math.random() * 0.3 - 0.15;
-        
         stairsGroup.add(segment);
     }
     
@@ -1514,7 +1524,6 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
     for (let i = 0; i < stepCount; i++) {
         const stepY = startY - (i + 1) * stepHeight;
         const stepZ = startZ - i * stepDepth - stepDepth/2;
-        
         const step = new THREE.Mesh(
             new THREE.BoxGeometry(stepWidth, 0.15, stepDepth),
             mezzMat
@@ -1522,6 +1531,10 @@ function createBalconyStairs(startX, startY, startZ, mezzMat, railMat) {
         step.position.set(startX, stepY - 0.075, stepZ);
         step.castShadow = true;
         step.receiveShadow = true;
+        // Make the lowest step invisible if it is at/below floor level
+        if (i === stepCount - 1 && stepY - 0.075 <= 0.08) {
+            step.visible = false;
+        }
         scene.add(step);
     }
     

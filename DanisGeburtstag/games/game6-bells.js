@@ -146,13 +146,54 @@ const bellGame = (() => {
             `;
             bellEl.appendChild(clapper);
             
-            // Click Handler
+            // Linksklick: Spielzug, Rechtsklick: Testen
             bellEl.onclick = () => handleBellClick(index);
+            bellEl.oncontextmenu = (e) => {
+                e.preventDefault();
+                playTone(index, 500);
+                highlightBell(index, 350);
+            };
             
             bellWrapper.appendChild(rope);
             bellWrapper.appendChild(bellEl);
             container.appendChild(bellWrapper);
         });
+
+        // Legende/Steuerung unten anzeigen
+        let legend = document.getElementById('bellLegend');
+        if (!legend) {
+            legend = document.createElement('div');
+            legend.id = 'bellLegend';
+            legend.style.cssText = 'text-align:center;margin-top:18px;color:#d4c4a8;font-size:15px;display:flex;justify-content:center;gap:18px;align-items:center;';
+            container.parentElement.appendChild(legend);
+        }
+        legend.innerHTML = `
+            <span style="display:flex;align-items:center;gap:14px;">
+                <span style="display:inline-block;width:48px;height:48px;position:relative;vertical-align:middle;">
+                    <svg width="48" height="48" viewBox="0 0 48 48" style="vertical-align:middle;">
+                        <rect x="8" y="6" width="32" height="36" rx="16" fill="#fff" stroke="#bcae8a" stroke-width="2.2"/>
+                        <rect x="10" y="8" width="12" height="14" rx="6" fill="#bcae8a" stroke="#bcae8a" stroke-width="1.2"/>
+                        <rect x="26" y="8" width="12" height="14" rx="6" fill="#e0d6c3" stroke="#bcae8a" stroke-width="1.2"/>
+                        <rect x="23.5" y="8" width="1" height="32" fill="#bcae8a" opacity="0.4"/>
+                        <text x="16" y="18" font-size="10" font-family="Arial" font-weight="bold" fill="#fff" stroke="#7a6b4a" stroke-width="0.5" text-anchor="middle">L</text>
+                    </svg>
+                </span>
+                = Reihenfolge
+            </span>
+            <span style="display:flex;align-items:center;gap:14px;">
+                <span style="display:inline-block;width:48px;height:48px;position:relative;vertical-align:middle;">
+                    <svg width="48" height="48" viewBox="0 0 48 48" style="vertical-align:middle;">
+                        <rect x="8" y="6" width="32" height="36" rx="16" fill="#fff" stroke="#bcae8a" stroke-width="2.2"/>
+                        <rect x="10" y="8" width="12" height="14" rx="6" fill="#e0d6c3" stroke="#bcae8a" stroke-width="1.2"/>
+                        <rect x="26" y="8" width="12" height="14" rx="6" fill="#bcae8a" stroke="#bcae8a" stroke-width="1.2"/>
+                        <rect x="23.5" y="8" width="1" height="32" fill="#bcae8a" opacity="0.4"/>
+                        <text x="32" y="18" font-size="10" font-family="Arial" font-weight="bold" fill="#fff" stroke="#7a6b4a" stroke-width="0.5" text-anchor="middle">R</text>
+                    </svg>
+                </span>
+                = Glocke testen
+            </span>
+        `;
+        // end of render
         
         // Phase-Anzeige aktualisieren
         updatePhaseIndicator();
