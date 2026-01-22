@@ -545,19 +545,15 @@ function createRuneDesk() {
     interactiveObjects.push(interactZone);
     scene.add(interactZone);
 
-    // Interactive zone for mystical glow game (game 5) on the floating candle above the desk (fireplace mantle)
-    // The floating candles are at (wallX + 1.0, 3.48, centerZ + dz) in createFireplace
-    // We'll use the left candle (dz = -1.0)
-    const roomWidth = CONFIG.room.width;
-    const wallX = -roomWidth/2;
-    const centerZ = 0;
-    const dz = -1.0; // left floating candle
+    // Interactive zone for mystical glow game (game 5) on the magic orb (Glaskugel)
+    // Trigger für das Leuchten-Spiel (game 5) auf der linken schwebenden Kerze
+    // Trigger für das Leuchten-Event: etwas über und hinter der Glaskugel
     const fireGameZone = new THREE.Mesh(
-        new THREE.BoxGeometry(0.18, 0.18, 0.18),
+        new THREE.BoxGeometry(0.35, 0.5, 0.35),
         new THREE.MeshBasicMaterial({ visible: false })
     );
-    fireGameZone.position.set(wallX + 1.0, 3.25, centerZ + dz); // lower, closer to player
-    fireGameZone.userData = { type: 'game5', hint: 'Was passiert wohl, wenn man die schwebende Kerze untersucht?', game: 5 };
+    fireGameZone.position.set(0.74, 3.5, -3.3); // etwas höher und weiter zurück als die Kugel
+    fireGameZone.userData = { type: 'game5', hint: 'Was passiert wohl, wenn man die Kerze untersucht?', game: 5 };
     interactiveObjects.push(fireGameZone);
     scene.add(fireGameZone);
 }
