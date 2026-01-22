@@ -107,7 +107,7 @@ function createReadingNook() {
 
     // Größere Trigger-Box
     const triggerBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, 0.3, 0.5),
+        new THREE.BoxGeometry(0.8, 0.8, 0.8),
         new THREE.MeshBasicMaterial({ visible: false })
     );
     triggerBox.position.set(nookX, nookY + 0.5, nookZ);

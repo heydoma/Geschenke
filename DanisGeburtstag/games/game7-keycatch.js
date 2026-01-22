@@ -6,7 +6,7 @@
 const keyCatch = (() => {
     // === KONSTANTEN ===
     const TOTAL_KEYS = 40;  // Viele ablenkende Schlüssel
-    const CATCH_TIME = 20000;  // 20 Sekunden Zeit
+    // const CATCH_TIME = 20000;  // Zeit entfernt
     const KEY_SPEED_MIN = 3;
     const KEY_SPEED_MAX = 6;
     
@@ -14,14 +14,14 @@ const keyCatch = (() => {
     let state = 'idle'; // idle, playing, success, failed
     let keys = [];
     let goldenKeyIndex = -1;
-    let timeRemaining = CATCH_TIME;
+    // let timeRemaining = CATCH_TIME; // Zeit entfernt
     let animationFrame = null;
     let lastTime = 0;
     
     // === INIT ===
     function init() {
         state = 'playing';
-        timeRemaining = CATCH_TIME;
+        // timeRemaining = CATCH_TIME; // Zeit entfernt
         keys = [];
         
         // Container Größe ermitteln
@@ -73,21 +73,7 @@ const keyCatch = (() => {
             cursor: crosshair;
         `;
         
-        // Timer anzeigen
-        const timer = document.createElement('div');
-        timer.id = 'keyTimer';
-        timer.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: ${timeRemaining < 5000 ? '#ff4444' : '#d4c4a8'};
-            font-size: 18px;
-            font-family: Georgia, serif;
-            z-index: 10;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
-        `;
-        timer.textContent = `⏱️ ${Math.ceil(timeRemaining / 1000)}s`;
-        container.appendChild(timer);
+        // Timer entfernt
         
         // Hinweis
         const hint = document.createElement('div');
@@ -178,8 +164,7 @@ const keyCatch = (() => {
         const delta = deltaMs / 16;  // Normalize to ~60fps
         lastTime = now;
         
-        // Timer aktualisieren
-        timeRemaining -= deltaMs;
+        // Kein Timer mehr
         
         const container = document.getElementById('keyContainer');
         if (!container) return;
@@ -233,11 +218,7 @@ const keyCatch = (() => {
             timer.style.color = seconds <= 5 ? '#ff4444' : '#d4c4a8';
         }
         
-        // Zeit abgelaufen?
-        if (timeRemaining <= 0) {
-            handleTimeout();
-            return;
-        }
+        // Kein Timeout mehr
         
         animationFrame = requestAnimationFrame(gameLoop);
     }
@@ -263,12 +244,7 @@ const keyCatch = (() => {
                 }, 300);
             }
             
-            // Zeitstrafe
-            timeRemaining -= 1000;
-            
-            if (typeof showMessage === 'function') {
-                showMessage('❌ Falscher Schlüssel! -1 Sekunde', 'error');
-            }
+            // Keine Zeitstrafe mehr
         }
     }
     
@@ -309,20 +285,6 @@ const keyCatch = (() => {
                 solveMinigame(2, '🔑 Goldener Schlüssel');  // Game 2!
             }
         }, 1500);
-    }
-    
-    function handleTimeout() {
-        state = 'failed';
-        cancelAnimationFrame(animationFrame);
-        
-        if (typeof showMessage === 'function') {
-            showMessage('⏰ Zeit abgelaufen! Versuche es nochmal.', 'error');
-        }
-        
-        // Nach kurzer Pause neu starten
-        setTimeout(() => {
-            init();
-        }, 2000);
     }
     
     function reset() {
