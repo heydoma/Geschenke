@@ -267,6 +267,14 @@ window.addEventListener('load', () => {
         window.solveMinigame = function(num, artifact, number = null) {
             origSolve(num, artifact, number);
 
+            // Schließe das Minigame automatisch nach erfolgreichem Lösen
+            const modal = document.getElementById('minigame' + num);
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+            window.onMinigameClosed(num);
+
             const gem = document.querySelector(`.progress-gem[data-game="${num}"]`);
             if (gem) gem.classList.add('active');
 

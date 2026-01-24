@@ -112,6 +112,7 @@ const CONFIG = {
         wallKey: { game: 2, hint: "Fliegende Schlüssel schwirren herum..." },  // Key-Spiel ist jetzt Game 2
         bookshelfRight: { game: 7, hint: "Diese Bücher flüstern..." },  // Bücher sind jetzt Game 7
         desk: { game: 3, hint: "Verschlüsselte Runen..." },
+        runeDesk: { game: 3, hint: "Verschlüsselte Runen..." },  // Neuer Rune Desk für Cipher
         potions: { game: 1, hint: "Seltsame Tränke..." },
         bells: { game: 6, hint: "Ein magisches Glockenspiel..." },
         stairs: { game: 4, hint: "Magische Treppen-Schriften..." },
